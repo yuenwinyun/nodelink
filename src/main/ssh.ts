@@ -68,12 +68,25 @@ export function sshConnect(
       reject(err)
     })
 
+    // Use SSH agent as fallback when no explicit credentials are provided
+    const useAgent = !config.password && !config.privateKey
+
+    // Handle keyboard-interactive auth (many servers use this instead of 'password')
+    if (config.password) {
+      client.on('keyboard-interactive', (_name, _instructions, _lang, prompts, finish) => {
+        // Respond to all prompts with the password (typically just one "Password:" prompt)
+        finish(prompts.map(() => config.password!))
+      })
+    }
+
     client.connect({
       host: config.host,
       port: config.port,
       username: config.username,
       password: config.password,
       privateKey: config.privateKey,
+      tryKeyboard: !!config.password,
+      agent: useAgent ? process.env.SSH_AUTH_SOCK : undefined,
       hostVerifier: () => true // auto-accept for mock scope
     })
   })

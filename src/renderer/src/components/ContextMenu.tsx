@@ -25,7 +25,18 @@ export function ContextMenu({ children, items }: ContextMenuProps): React.JSX.El
   return (
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <DropdownMenu.Trigger asChild>
-        <div onContextMenu={handleContextMenu}>{children}</div>
+        <div
+          onContextMenu={handleContextMenu}
+          onPointerDown={(e) => {
+            // Prevent Radix DropdownMenu from opening on left/middle click.
+            // Only right-click (via onContextMenu) should open the menu.
+            if (e.button !== 2) {
+              e.preventDefault()
+            }
+          }}
+        >
+          {children}
+        </div>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
