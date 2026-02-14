@@ -3,6 +3,7 @@ import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 import type { Host, KeychainEntry } from '@shared/types'
+import { buildSshConfig } from '../types'
 
 type Status = 'connecting' | 'connected' | 'disconnected' | 'error'
 
@@ -26,12 +27,19 @@ export function TerminalView({
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
+    const styles = getComputedStyle(document.documentElement)
+    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1d232a'
+    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#a6adbb'
+    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#a6adbb'
+    const termSelection = styles.getPropertyValue('--terminal-selection').trim() || 'rgba(166, 173, 187, 0.2)'
+
     const term = new XTerm({
       cursorBlink: true,
       theme: {
-        background: '#1d232a',
-        foreground: '#a6adbb',
-        cursor: '#a6adbb'
+        background: termBg,
+        foreground: termFg,
+        cursor: termCursor,
+        selectionBackground: termSelection
       },
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
       fontSize: 14
@@ -76,36 +84,13 @@ export function TerminalView({
     window.addEventListener('resize', handleWindowResize)
 
     // Connect
-    const keychainEntry = host.keychainId
-      ? keychain.find((k) => k.id === host.keychainId) ?? null
-      : null
-
-    const config: {
-      host: string
-      port: number
-      username: string
-      password?: string
-      privateKey?: string
-    } = {
-      host: host.address,
-      port: host.port,
-      username: host.username
-    }
-
-    if (keychainEntry) {
-      if (keychainEntry.authType === 'key') {
-        config.privateKey = keychainEntry.sshKey
-      } else {
-        config.password = keychainEntry.password
-      }
-    }
+    const config = buildSshConfig(host, keychain)
 
     window.api
       .sshConnect(sessionId, config)
       .then(() => {
         setStatus('connected')
         fit.fit()
-        // Send initial resize
         window.api.sshResize(sessionId, term.cols, term.rows)
       })
       .catch((err: Error) => {
@@ -128,30 +113,7 @@ export function TerminalView({
     setStatus('connecting')
     setErrorMsg('')
 
-    const keychainEntry = host.keychainId
-      ? keychain.find((k) => k.id === host.keychainId) ?? null
-      : null
-
-    const config: {
-      host: string
-      port: number
-      username: string
-      password?: string
-      privateKey?: string
-    } = {
-      host: host.address,
-      port: host.port,
-      username: host.username
-    }
-
-    if (keychainEntry) {
-      if (keychainEntry.authType === 'key') {
-        config.privateKey = keychainEntry.sshKey
-      } else {
-        config.password = keychainEntry.password
-      }
-    }
-
+    const config = buildSshConfig(host, keychain)
     xtermRef.current?.clear()
 
     window.api

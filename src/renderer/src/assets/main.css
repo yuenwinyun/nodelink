@@ -8,3 +8,10 @@ html, body, #root {
   margin: 0;
   padding: 0;
 }
+
+[data-theme='dark'] {
+  --terminal-bg: #1d232a;
+  --terminal-fg: #a6adbb;
+  --terminal-cursor: #a6adbb;
+  --terminal-selection: rgba(166, 173, 187, 0.2);
+}

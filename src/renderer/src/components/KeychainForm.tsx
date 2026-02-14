@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import * as Toggle from '@radix-ui/react-toggle'
 import type { KeychainEntry } from '@shared/types'
 
 interface KeychainFormProps {
@@ -121,13 +122,14 @@ export function KeychainForm({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button
-                type="button"
+              <Toggle.Root
+                pressed={showPassword}
+                onPressedChange={setShowPassword}
+                aria-label="Toggle password visibility"
                 className="btn btn-ghost btn-xs absolute right-2 top-1/2 -translate-y-1/2"
-                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? 'Hide' : 'Show'}
-              </button>
+              </Toggle.Root>
             </div>
             {errors.password && <p className="text-error text-xs mt-1">{errors.password}</p>}
           </fieldset>

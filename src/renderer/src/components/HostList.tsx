@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import type { Host } from '@shared/types'
+import { ContextMenu } from './ContextMenu'
+import { ConfirmDialog } from './ConfirmDialog'
 
 interface HostListProps {
   hosts: Host[]
@@ -17,6 +20,8 @@ export function HostList({
   onConnect,
   onDelete
 }: HostListProps): React.JSX.Element {
+  const [deleteTarget, setDeleteTarget] = useState<Host | null>(null)
+
   if (hosts.length === 0) {
     return (
       <div className="text-center text-base-content/40 py-8 text-sm">
@@ -26,32 +31,51 @@ export function HostList({
   }
 
   return (
-    <ul className="menu menu-sm gap-1">
-      {hosts.map((host) => (
-        <li key={host.id}>
-          <button
-            className={`flex items-center gap-2 ${selectedId === host.id ? 'active' : ''}`}
-            onClick={() => onSelect(host)}
-            onDoubleClick={() => onConnect(host)}
-            onContextMenu={(e) => {
-              e.preventDefault()
-              if (confirm(`Delete "${host.name}"?`)) {
-                onDelete(host.id)
-              }
-            }}
-          >
-            {connectedHostIds.has(host.id) && (
-              <span className="badge badge-xs badge-success" />
-            )}
-            <div className="flex flex-col items-start min-w-0">
-              <span className="font-medium truncate w-full">{host.name}</span>
-              <span className="text-xs text-base-content/50 truncate w-full">
-                {host.username}@{host.address}:{host.port}
-              </span>
-            </div>
-          </button>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="menu menu-sm gap-1">
+        {hosts.map((host) => (
+          <li key={host.id}>
+            <ContextMenu
+              items={[
+                {
+                  label: 'Delete',
+                  variant: 'danger',
+                  onClick: () => setDeleteTarget(host)
+                }
+              ]}
+            >
+              <button
+                className={`flex items-center gap-2 w-full ${selectedId === host.id ? 'active' : ''}`}
+                onClick={() => onSelect(host)}
+                onDoubleClick={() => onConnect(host)}
+              >
+                {connectedHostIds.has(host.id) && (
+                  <span className="badge badge-xs badge-success" />
+                )}
+                <div className="flex flex-col items-start min-w-0">
+                  <span className="font-medium truncate w-full">{host.name}</span>
+                  <span className="text-xs text-base-content/50 truncate w-full">
+                    {host.username}@{host.address}:{host.port}
+                  </span>
+                </div>
+              </button>
+            </ContextMenu>
+          </li>
+        ))}
+      </ul>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null)
+        }}
+        title="Delete Host"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (deleteTarget) onDelete(deleteTarget.id)
+        }}
+      />
+    </>
   )
 }

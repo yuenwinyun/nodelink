@@ -1,173 +1,111 @@
-import { useState, useCallback } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import type { Host, KeychainEntry } from '@shared/types'
 import { useHosts } from './hooks/useHosts'
 import { useKeychain } from './hooks/useKeychain'
+import { useAppNavigation } from './hooks/useAppNavigation'
 import { Sidebar } from './components/Sidebar'
 import { HostForm } from './components/HostForm'
 import { KeychainForm } from './components/KeychainForm'
 import { EmptyState } from './components/EmptyState'
 import { TerminalView } from './components/Terminal'
 
-type Tab = 'hosts' | 'keychain'
-type View =
-  | { type: 'empty' }
-  | { type: 'host-form'; host: Host | null }
-  | { type: 'keychain-form'; entry: KeychainEntry | null }
-  | { type: 'terminal'; host: Host; sessionId: string }
-
 function App(): React.JSX.Element {
-  const [activeTab, setActiveTab] = useState<Tab>('hosts')
-  const [view, setView] = useState<View>({ type: 'empty' })
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [connectedHostIds, setConnectedHostIds] = useState<Set<string>>(new Set())
-
-  const { hosts, create: createHost, update: updateHost, remove: removeHost, refresh: refreshHosts } = useHosts()
+  const nav = useAppNavigation()
+  const { hosts, loading: hostsLoading, create: createHost, update: updateHost, remove: removeHost, refresh: refreshHosts } = useHosts()
   const {
     keychain,
+    loading: keychainLoading,
     create: createKeychainEntry,
     update: updateKeychainEntry,
     remove: removeKeychainEntry
   } = useKeychain()
 
-  const handleSelectHost = (host: Host): void => {
-    setSelectedId(host.id)
-    setView({ type: 'host-form', host })
-  }
-
-  const handleSelectKeychain = (entry: KeychainEntry): void => {
-    setSelectedId(entry.id)
-    setView({ type: 'keychain-form', entry })
-  }
-
-  const handleConnectHost = useCallback((host: Host): void => {
-    const sessionId = uuidv4()
-    setSelectedId(host.id)
-    setConnectedHostIds((prev) => new Set(prev).add(host.id))
-    setView({ type: 'terminal', host, sessionId })
-  }, [])
-
-  const handleDisconnect = useCallback((): void => {
-    if (view.type === 'terminal') {
-      setConnectedHostIds((prev) => {
-        const next = new Set(prev)
-        next.delete(view.host.id)
-        return next
-      })
-    }
-    setView({ type: 'empty' })
-    setSelectedId(null)
-  }, [view])
-
-  const handleAddHost = (): void => {
-    setSelectedId(null)
-    setView({ type: 'host-form', host: null })
-  }
-
-  const handleAddKeychain = (): void => {
-    setSelectedId(null)
-    setView({ type: 'keychain-form', entry: null })
-  }
-
   const handleSaveHost = async (
     input: Omit<Host, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<void> => {
-    if (view.type === 'host-form' && view.host) {
-      await updateHost(view.host.id, input)
+    if (nav.view.type === 'host-form' && nav.view.host) {
+      await updateHost(nav.view.host.id, input)
     } else {
       await createHost(input)
     }
-    setView({ type: 'empty' })
-    setSelectedId(null)
+    nav.resetView()
   }
 
   const handleSaveKeychain = async (
     input: Omit<KeychainEntry, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<void> => {
-    if (view.type === 'keychain-form' && view.entry) {
-      await updateKeychainEntry(view.entry.id, input)
+    if (nav.view.type === 'keychain-form' && nav.view.entry) {
+      await updateKeychainEntry(nav.view.entry.id, input)
     } else {
       await createKeychainEntry(input)
     }
-    setView({ type: 'empty' })
-    setSelectedId(null)
+    nav.resetView()
   }
 
   const handleDeleteHost = async (id: string): Promise<void> => {
     await removeHost(id)
-    if (selectedId === id) {
-      setView({ type: 'empty' })
-      setSelectedId(null)
-    }
+    nav.clearIfSelected(id)
   }
 
   const handleDeleteKeychain = async (id: string): Promise<void> => {
     await removeKeychainEntry(id)
     await refreshHosts()
-    if (selectedId === id) {
-      setView({ type: 'empty' })
-      setSelectedId(null)
-    }
-  }
-
-  const handleCancel = (): void => {
-    setView({ type: 'empty' })
-    setSelectedId(null)
+    nav.clearIfSelected(id)
   }
 
   return (
     <div className="flex h-screen bg-base-300 text-base-content">
       <Sidebar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        activeTab={nav.activeTab}
+        onTabChange={nav.setActiveTab}
         hosts={hosts}
         keychain={keychain}
-        selectedId={selectedId}
-        connectedHostIds={connectedHostIds}
-        onSelectHost={handleSelectHost}
-        onSelectKeychain={handleSelectKeychain}
-        onConnectHost={handleConnectHost}
-        onAddHost={handleAddHost}
-        onAddKeychain={handleAddKeychain}
+        loading={hostsLoading || keychainLoading}
+        selectedId={nav.selectedId}
+        connectedHostIds={nav.connectedHostIds}
+        onSelectHost={nav.selectHost}
+        onSelectKeychain={nav.selectKeychain}
+        onConnectHost={nav.connectHost}
+        onAddHost={nav.addHost}
+        onAddKeychain={nav.addKeychain}
         onDeleteHost={handleDeleteHost}
         onDeleteKeychain={handleDeleteKeychain}
       />
 
       <main className="flex-1 overflow-hidden">
-        {view.type === 'empty' && (
+        {nav.view.type === 'empty' && (
           <EmptyState
             title="Welcome to Termius Mock"
             description="Select a host or keychain entry from the sidebar, or create a new one to get started. Double-click a host to connect."
             action={{
-              label: activeTab === 'hosts' ? 'Add Host' : 'Add Keychain Entry',
-              onClick: activeTab === 'hosts' ? handleAddHost : handleAddKeychain
+              label: nav.activeTab === 'hosts' ? 'Add Host' : 'Add Keychain Entry',
+              onClick: nav.activeTab === 'hosts' ? nav.addHost : nav.addKeychain
             }}
           />
         )}
 
-        {view.type === 'host-form' && (
+        {nav.view.type === 'host-form' && (
           <HostForm
-            host={view.host}
+            host={nav.view.host}
             keychain={keychain}
             onSave={handleSaveHost}
-            onCancel={handleCancel}
+            onCancel={nav.resetView}
           />
         )}
 
-        {view.type === 'keychain-form' && (
+        {nav.view.type === 'keychain-form' && (
           <KeychainForm
-            entry={view.entry}
+            entry={nav.view.entry}
             onSave={handleSaveKeychain}
-            onCancel={handleCancel}
+            onCancel={nav.resetView}
           />
         )}
 
-        {view.type === 'terminal' && (
+        {nav.view.type === 'terminal' && (
           <TerminalView
-            host={view.host}
+            host={nav.view.host}
             keychain={keychain}
-            sessionId={view.sessionId}
-            onDisconnect={handleDisconnect}
+            sessionId={nav.view.sessionId}
+            onDisconnect={nav.disconnect}
           />
         )}
       </main>

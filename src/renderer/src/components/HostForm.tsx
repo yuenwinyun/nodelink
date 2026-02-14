@@ -8,7 +8,12 @@ interface HostFormProps {
   onCancel: () => void
 }
 
-export function HostForm({ host, keychain, onSave, onCancel }: HostFormProps): React.JSX.Element {
+export function HostForm({
+  host,
+  keychain,
+  onSave,
+  onCancel
+}: HostFormProps): React.JSX.Element {
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [port, setPort] = useState(22)
@@ -39,15 +44,25 @@ export function HostForm({ host, keychain, onSave, onCancel }: HostFormProps): R
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault()
     if (!validate()) return
-    onSave({ name: name.trim(), address: address.trim(), port, username: username.trim(), keychainId })
+    onSave({
+      name: name.trim(),
+      address: address.trim(),
+      port,
+      username: username.trim(),
+      keychainId
+    })
   }
 
   return (
     <div className="max-w-lg mx-auto p-6">
-      <h2 className="text-xl font-bold mb-6">{host ? 'Edit Host' : 'New Host'}</h2>
+      <h2 className="text-xl font-bold mb-6">
+        {host ? 'Edit Host' : 'New Host'}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-name">Name</label>
+          <label className="fieldset-label" htmlFor="host-name">
+            Name
+          </label>
           <input
             id="host-name"
             type="text"
@@ -56,11 +71,15 @@ export function HostForm({ host, keychain, onSave, onCancel }: HostFormProps): R
             onChange={(e) => setName(e.target.value)}
             placeholder="My Server"
           />
-          {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
+          {errors.name && (
+            <p className="text-error text-xs mt-1">{errors.name}</p>
+          )}
         </fieldset>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-address">Address</label>
+          <label className="fieldset-label" htmlFor="host-address">
+            Address
+          </label>
           <input
             id="host-address"
             type="text"
@@ -69,11 +88,15 @@ export function HostForm({ host, keychain, onSave, onCancel }: HostFormProps): R
             onChange={(e) => setAddress(e.target.value)}
             placeholder="192.168.1.100 or example.com"
           />
-          {errors.address && <p className="text-error text-xs mt-1">{errors.address}</p>}
+          {errors.address && (
+            <p className="text-error text-xs mt-1">{errors.address}</p>
+          )}
         </fieldset>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-port">Port</label>
+          <label className="fieldset-label" htmlFor="host-port">
+            Port
+          </label>
           <input
             id="host-port"
             type="number"
@@ -83,11 +106,15 @@ export function HostForm({ host, keychain, onSave, onCancel }: HostFormProps): R
             min={1}
             max={65535}
           />
-          {errors.port && <p className="text-error text-xs mt-1">{errors.port}</p>}
+          {errors.port && (
+            <p className="text-error text-xs mt-1">{errors.port}</p>
+          )}
         </fieldset>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-username">Username</label>
+          <label className="fieldset-label" htmlFor="host-username">
+            Username
+          </label>
           <input
             id="host-username"
             type="text"
@@ -96,11 +123,15 @@ export function HostForm({ host, keychain, onSave, onCancel }: HostFormProps): R
             onChange={(e) => setUsername(e.target.value)}
             placeholder="root"
           />
-          {errors.username && <p className="text-error text-xs mt-1">{errors.username}</p>}
+          {errors.username && (
+            <p className="text-error text-xs mt-1">{errors.username}</p>
+          )}
         </fieldset>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-keychain">Keychain</label>
+          <label className="fieldset-label" htmlFor="host-keychain">
+            Keychain
+          </label>
           <select
             id="host-keychain"
             className="select select-bordered w-full"

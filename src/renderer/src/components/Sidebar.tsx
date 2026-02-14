@@ -1,14 +1,14 @@
 import type { Host, KeychainEntry } from '@shared/types'
+import type { Tab } from '../types'
 import { HostList } from './HostList'
 import { KeychainList } from './KeychainList'
-
-type Tab = 'hosts' | 'keychain'
 
 interface SidebarProps {
   activeTab: Tab
   onTabChange: (tab: Tab) => void
   hosts: Host[]
   keychain: KeychainEntry[]
+  loading: boolean
   selectedId: string | null
   connectedHostIds: Set<string>
   onSelectHost: (host: Host) => void
@@ -25,6 +25,7 @@ export function Sidebar({
   onTabChange,
   hosts,
   keychain,
+  loading,
   selectedId,
   connectedHostIds,
   onSelectHost,
@@ -59,7 +60,13 @@ export function Sidebar({
       </div>
 
       <div className="flex-1 overflow-y-auto p-2">
-        {activeTab === 'hosts' ? (
+        {loading ? (
+          <div className="flex flex-col gap-2 p-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="skeleton h-12 w-full rounded-btn" />
+            ))}
+          </div>
+        ) : activeTab === 'hosts' ? (
           <HostList
             hosts={hosts}
             selectedId={selectedId}
