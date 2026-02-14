@@ -1,5 +1,5 @@
-appId: com.electron.termius-mock
-productName: termius-mock
+appId: com.electron.nodelink
+productName: NodeLink
 directories:
   buildResources: build
 files:

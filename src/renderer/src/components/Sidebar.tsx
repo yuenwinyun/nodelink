@@ -39,7 +39,7 @@ export function Sidebar({
   return (
     <div className="w-[280px] min-w-[280px] bg-base-200 border-r border-base-300 flex flex-col h-full">
       <div className="p-4 pb-2">
-        <h1 className="text-lg font-bold tracking-tight">Termius Mock</h1>
+        <h1 className="text-lg font-bold tracking-tight">NodeLink</h1>
       </div>
 
       <div role="tablist" className="tabs tabs-bordered mx-4">

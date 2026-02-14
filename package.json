@@ -1,7 +1,7 @@
 {
-  "name": "termius-mock",
+  "name": "nodelink",
   "version": "1.0.0",
-  "description": "A simplified Termius mock desktop app for managing SSH hosts and keychain credentials",
+  "description": "A desktop app for managing SSH hosts and keychain credentials",
   "main": "./out/main/index.js",
   "author": "",
   "homepage": "https://electron-vite.org",

@@ -74,7 +74,7 @@ function App(): React.JSX.Element {
       <main className="flex-1 overflow-hidden">
         {nav.view.type === 'empty' && (
           <EmptyState
-            title="Welcome to Termius Mock"
+            title="Welcome to NodeLink"
             description="Select a host or keychain entry from the sidebar, or create a new one to get started. Double-click a host to connect."
             action={{
               label: nav.activeTab === 'hosts' ? 'Add Host' : 'Add Keychain Entry',
