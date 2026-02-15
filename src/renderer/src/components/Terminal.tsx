@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
+import { Unicode11Addon } from '@xterm/addon-unicode11'
 import '@xterm/xterm/css/xterm.css'
 import type { Host, KeychainEntry } from '@shared/types'
 import { buildSshConfig } from '../types'
@@ -27,11 +28,15 @@ export function TerminalView({
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
+    const container = termRef.current
+    if (!container) return
+
     const styles = getComputedStyle(document.documentElement)
     const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1d232a'
     const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#a6adbb'
     const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#a6adbb'
-    const termSelection = styles.getPropertyValue('--terminal-selection').trim() || 'rgba(166, 173, 187, 0.2)'
+    const termSelection =
+      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(166, 173, 187, 0.2)'
 
     const term = new XTerm({
       cursorBlink: true,
@@ -41,18 +46,26 @@ export function TerminalView({
         cursor: termCursor,
         selectionBackground: termSelection
       },
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+      fontFamily:
+        '"MesloLGM Nerd Font Mono", "MesloLGS Nerd Font Mono", "MesloLGS NF", "Meslo LG M for Powerline", Hack, Menlo, Monaco, "Courier New", monospace',
       fontSize: 14
     })
     const fit = new FitAddon()
+    const unicode11 = new Unicode11Addon()
     term.loadAddon(fit)
+    term.loadAddon(unicode11)
+    term.unicode.activeVersion = '11'
     xtermRef.current = term
     fitRef.current = fit
 
-    if (termRef.current) {
-      term.open(termRef.current)
+    term.open(container)
+
+    // Delay initial fit until layout has settled — calling fit() synchronously
+    // after open() often measures the container before it has its final size,
+    // resulting in wrong character dimensions and broken-looking fonts.
+    requestAnimationFrame(() => {
       fit.fit()
-    }
+    })
 
     // Handle incoming data
     const removeDataListener = window.api.onSshData((sid, data) => {
@@ -78,10 +91,14 @@ export function TerminalView({
       window.api.sshResize(sessionId, cols, rows)
     })
 
-    const handleWindowResize = (): void => {
-      fit.fit()
-    }
-    window.addEventListener('resize', handleWindowResize)
+    // Use ResizeObserver on the container for reliable resize tracking
+    // (handles window resize, sidebar toggle, pane drag, etc.)
+    const resizeObserver = new ResizeObserver(() => {
+      requestAnimationFrame(() => {
+        fit.fit()
+      })
+    })
+    resizeObserver.observe(container)
 
     // Connect
     const config = buildSshConfig(host, keychain)
@@ -90,8 +107,11 @@ export function TerminalView({
       .sshConnect(sessionId, config)
       .then(() => {
         setStatus('connected')
-        fit.fit()
-        window.api.sshResize(sessionId, term.cols, term.rows)
+        // Re-fit after connection in case the overlay hide changed layout
+        requestAnimationFrame(() => {
+          fit.fit()
+          window.api.sshResize(sessionId, term.cols, term.rows)
+        })
       })
       .catch((err: Error) => {
         setStatus('error')
@@ -103,7 +123,7 @@ export function TerminalView({
       removeClosedListener()
       onData.dispose()
       onResize.dispose()
-      window.removeEventListener('resize', handleWindowResize)
+      resizeObserver.disconnect()
       window.api.sshDisconnect(sessionId)
       term.dispose()
     }
@@ -120,10 +140,12 @@ export function TerminalView({
       .sshConnect(sessionId, config)
       .then(() => {
         setStatus('connected')
-        if (fitRef.current) fitRef.current.fit()
-        if (xtermRef.current) {
-          window.api.sshResize(sessionId, xtermRef.current.cols, xtermRef.current.rows)
-        }
+        requestAnimationFrame(() => {
+          if (fitRef.current) fitRef.current.fit()
+          if (xtermRef.current) {
+            window.api.sshResize(sessionId, xtermRef.current.cols, xtermRef.current.rows)
+          }
+        })
       })
       .catch((err: Error) => {
         setStatus('error')

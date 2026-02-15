@@ -45,7 +45,7 @@ export function sshConnect(
         stream.on('data', (data: Buffer) => {
           const win = getMainWindow()
           if (win && !win.isDestroyed()) {
-            win.webContents.send('ssh:data', sessionId, data.toString('binary'))
+            win.webContents.send('ssh:data', sessionId, data.toString('utf-8'))
           }
         })
 
