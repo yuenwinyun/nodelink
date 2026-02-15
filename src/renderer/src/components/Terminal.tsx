@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
-import { Unicode11Addon } from '@xterm/addon-unicode11'
 import '@xterm/xterm/css/xterm.css'
 import type { Host, KeychainEntry } from '@shared/types'
 import { buildSshConfig } from '../types'
@@ -51,10 +50,7 @@ export function TerminalView({
       fontSize: 14
     })
     const fit = new FitAddon()
-    const unicode11 = new Unicode11Addon()
     term.loadAddon(fit)
-    term.loadAddon(unicode11)
-    term.unicode.activeVersion = '11'
     xtermRef.current = term
     fitRef.current = fit
 
