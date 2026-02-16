@@ -13,16 +13,16 @@ A desktop SSH client for managing remote hosts and credentials, built with Elect
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Electron 39 |
-| Build | electron-vite, Vite 7 |
-| UI | React 19, TypeScript 5.9 |
-| Styling | Tailwind CSS 4, daisyUI 5 |
+| Layer      | Technology                              |
+| ---------- | --------------------------------------- |
+| Framework  | Electron 39                             |
+| Build      | electron-vite, Vite 7                   |
+| UI         | React 19, TypeScript 5.9                |
+| Styling    | Tailwind CSS 4, daisyUI 5               |
 | Components | Radix UI (Dialog, DropdownMenu, Toggle) |
-| Terminal | xterm.js 6, FitAddon, Unicode11Addon |
-| SSH | ssh2 |
-| Storage | JSON file in app data directory |
+| Terminal   | xterm.js 6, FitAddon, Unicode11Addon    |
+| SSH        | ssh2                                    |
+| Storage    | JSON file in app data directory         |
 
 ## Getting Started
 

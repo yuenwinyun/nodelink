@@ -10,9 +10,15 @@ import {
   getKeychain,
   createKeychainEntry,
   updateKeychainEntry,
-  deleteKeychainEntry
+  deleteKeychainEntry,
+  getSnippets,
+  createSnippet,
+  updateSnippet,
+  deleteSnippet
 } from './store'
 import { sshConnect, sshInput, sshResize, sshDisconnect, sshDisconnectAll } from './ssh'
+import { ptySpawn, ptyInput, ptyResize, ptyKill, ptyKillAll } from './pty'
+import { tunnelStart, tunnelStop, tunnelStopAll, getActiveTunnels, tunnelOpenBrowser } from './tunnel'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -56,11 +62,30 @@ function registerIpcHandlers(): void {
   ipcMain.handle('keychain:update', (_, id, input) => updateKeychainEntry(id, input))
   ipcMain.handle('keychain:delete', (_, id) => deleteKeychainEntry(id))
 
+  // Snippets
+  ipcMain.handle('snippets:getAll', () => getSnippets())
+  ipcMain.handle('snippets:create', (_, input) => createSnippet(input))
+  ipcMain.handle('snippets:update', (_, id, input) => updateSnippet(id, input))
+  ipcMain.handle('snippets:delete', (_, id) => deleteSnippet(id))
+
   // SSH
   ipcMain.handle('ssh:connect', (_, sessionId, config) => sshConnect(sessionId, config))
   ipcMain.on('ssh:input', (_, sessionId, data) => sshInput(sessionId, data))
   ipcMain.on('ssh:resize', (_, sessionId, cols, rows) => sshResize(sessionId, cols, rows))
   ipcMain.on('ssh:disconnect', (_, sessionId) => sshDisconnect(sessionId))
+
+  // Local PTY
+  ipcMain.handle('pty:spawn', (_, sessionId) => ptySpawn(sessionId))
+  ipcMain.on('pty:input', (_, sessionId, data) => ptyInput(sessionId, data))
+  ipcMain.on('pty:resize', (_, sessionId, cols, rows) => ptyResize(sessionId, cols, rows))
+  ipcMain.on('pty:kill', (_, sessionId) => ptyKill(sessionId))
+
+  // Tunnels
+  ipcMain.handle('tunnel:start', (_, sessionId, config) => tunnelStart(sessionId, config))
+  ipcMain.handle('tunnel:stop', (_, sessionId, tunnelId) => tunnelStop(sessionId, tunnelId))
+  ipcMain.handle('tunnel:stopAll', (_, sessionId) => tunnelStopAll(sessionId))
+  ipcMain.handle('tunnel:getActive', (_, sessionId) => getActiveTunnels(sessionId))
+  ipcMain.handle('tunnel:openBrowser', (_, localPort) => tunnelOpenBrowser(localPort))
 }
 
 app.whenReady().then(() => {
@@ -80,6 +105,7 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   sshDisconnectAll()
+  ptyKillAll()
 })
 
 app.on('window-all-closed', () => {

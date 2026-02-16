@@ -49,7 +49,8 @@ export function HostForm({
       address: address.trim(),
       port,
       username: username.trim(),
-      keychainId
+      keychainId,
+      tunnels: host?.tunnels ?? []
     })
   }
 

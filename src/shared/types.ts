@@ -1,3 +1,11 @@
+export interface TunnelConfig {
+  id: string;
+  name: string;
+  localPort: number;
+  remoteHost: string;
+  remotePort: number;
+}
+
 export interface Host {
   id: string;
   name: string;
@@ -5,6 +13,7 @@ export interface Host {
   port: number;
   username: string;
   keychainId: string | null;
+  tunnels: TunnelConfig[];
   createdAt: string;
   updatedAt: string;
 }
@@ -20,7 +29,16 @@ export interface KeychainEntry {
   updatedAt: string;
 }
 
+export interface Snippet {
+  id: string;
+  name: string;
+  command: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AppData {
   hosts: Host[];
   keychain: KeychainEntry[];
+  snippets: Snippet[];
 }

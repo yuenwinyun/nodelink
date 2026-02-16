@@ -1,12 +1,20 @@
-import type { Host, KeychainEntry } from '@shared/types'
+import type { Host, KeychainEntry, Snippet } from '@shared/types'
 
-export type Tab = 'hosts' | 'keychain'
+export type Tab = 'hosts' | 'keychain' | 'snippets'
 
 export type View =
   | { type: 'empty' }
   | { type: 'host-form'; host: Host | null }
   | { type: 'keychain-form'; entry: KeychainEntry | null }
+  | { type: 'snippet-form'; snippet: Snippet | null }
   | { type: 'terminal'; host: Host; sessionId: string }
+  | { type: 'local-terminal'; sessionId: string }
+
+export interface ActiveTunnel {
+  tunnelId: string
+  localPort: number
+  name: string
+}
 
 export interface SshConfig {
   host: string

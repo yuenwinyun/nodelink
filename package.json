@@ -28,6 +28,7 @@
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
     "daisyui": "^5.5.18",
+    "node-pty": "^1.1.0",
     "ssh2": "^1.17.0",
     "tailwindcss": "^4.1.18",
     "uuid": "^13.0.0"
@@ -36,6 +37,7 @@
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.1.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
+    "@electron/rebuild": "^4.0.3",
     "@types/node": "^22.19.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -56,6 +58,7 @@
     "onlyBuiltDependencies": [
       "electron",
       "esbuild",
+      "node-pty",
       "ssh2"
     ]
   }
