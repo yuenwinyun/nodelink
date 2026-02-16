@@ -16,4 +16,16 @@ mac:
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
+win:
+  icon: resources/icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: NodeLink
 npmRebuild: false
