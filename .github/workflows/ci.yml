@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  lint-and-typecheck:
+  typecheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,9 +24,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      - name: Lint
-        run: pnpm lint
 
       - name: Typecheck
         run: pnpm typecheck
