@@ -1,9 +1,8 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - master
+  repository_dispatch:
+    types: [version-bumped]
 
 permissions:
   contents: write
