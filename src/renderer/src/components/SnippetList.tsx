@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal } from './icons'
 import type { Snippet } from '@shared/types'
 import { ContextMenu } from './ContextMenu'
 import { ConfirmDialog } from './ConfirmDialog'

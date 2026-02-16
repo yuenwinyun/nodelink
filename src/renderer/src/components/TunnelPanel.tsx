@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { X, Plus } from 'lucide-react'
+import { X, Plus } from './icons'
 import type { TunnelConfig } from '@shared/types'
 import type { ActiveTunnel } from '../types'
 
