@@ -34,13 +34,23 @@ jobs:
         run: npm version patch --no-git-tag-version
 
       - name: Commit version bump
+        id: commit
         run: |
-          git add package.json package-lock.json 2>/dev/null || true
-          git add pnpm-lock.yaml 2>/dev/null || true
+          git add package.json
           if git diff --cached --quiet; then
             echo "No version changes to commit"
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           NEW_VERSION=$(node -p "require('./package.json').version")
           git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
           git push origin HEAD:master
+          echo "bumped=true" >> "$GITHUB_OUTPUT"
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger release
+        if: steps.commit.outputs.bumped == 'true'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: version-bumped
+          client-payload: '{"version": "${{ steps.commit.outputs.version }}"}'
