@@ -23,7 +23,7 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --ignore-scripts
 
       - name: Typecheck
         run: pnpm typecheck
@@ -43,6 +43,9 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 9
+
+      - name: Install native build dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential python3 libx11-dev libxkbfile-dev
 
       - name: Install dependencies
         run: pnpm install
