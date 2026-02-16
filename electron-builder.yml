@@ -17,6 +17,7 @@ publish:
   provider: github
   owner: yuenwinyun
   repo: nodelink
+  releaseType: release
 mac:
   category: public.app-category.developer-tools
   hardenedRuntime: true
