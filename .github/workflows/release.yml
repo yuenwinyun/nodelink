@@ -2,14 +2,41 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
 
 permissions:
   contents: write
 
 jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version changed
+        id: check
+        run: |
+          CURRENT=$(node -p "require('./package.json').version")
+          PREVIOUS=$(git show HEAD~1:package.json | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).version")
+          if [ "$CURRENT" != "$PREVIOUS" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+            echo "Version changed: $PREVIOUS -> $CURRENT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Version unchanged: $CURRENT"
+          fi
+
   release-mac:
+    needs: check-version
+    if: needs.check-version.outputs.version_changed == 'true'
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -39,6 +66,8 @@ jobs:
         run: pnpm build:mac --publish always
 
   release-windows:
+    needs: check-version
+    if: needs.check-version.outputs.version_changed == 'true'
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -61,3 +90,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm build:win --publish always
+
+  create-tag:
+    needs: [check-version, release-mac, release-windows]
+    if: needs.check-version.outputs.version_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create git tag
+        run: |
+          git tag "v${{ needs.check-version.outputs.version }}"
+          git push origin "v${{ needs.check-version.outputs.version }}"
