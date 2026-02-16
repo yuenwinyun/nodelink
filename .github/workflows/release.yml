@@ -57,12 +57,46 @@ jobs:
       - name: Build and release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: pnpm build:mac --publish always
+          RAW_CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+          RAW_CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+          RAW_APPLE_ID: ${{ secrets.APPLE_ID }}
+          RAW_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          RAW_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+
+          USE_SIGNING=false
+          if [ -n "${RAW_CSC_LINK:-}" ]; then
+            if [[ "${RAW_CSC_LINK}" == *"://"* ]]; then
+              # URL-style certificate source.
+              USE_SIGNING=true
+            elif [[ "${RAW_CSC_LINK}" == /* ]]; then
+              # Absolute path must exist on runner.
+              if [ -f "${RAW_CSC_LINK}" ]; then
+                USE_SIGNING=true
+              else
+                echo "MAC_CSC_LINK points to a missing file: ${RAW_CSC_LINK}"
+              fi
+            else
+              # Non-path value is assumed to be base64 certificate content.
+              USE_SIGNING=true
+            fi
+          fi
+
+          if [ "${USE_SIGNING}" = "true" ]; then
+            export CSC_LINK="${RAW_CSC_LINK}"
+            export CSC_KEY_PASSWORD="${RAW_CSC_KEY_PASSWORD:-}"
+            export APPLE_ID="${RAW_APPLE_ID:-}"
+            export APPLE_APP_SPECIFIC_PASSWORD="${RAW_APPLE_APP_SPECIFIC_PASSWORD:-}"
+            export APPLE_TEAM_ID="${RAW_APPLE_TEAM_ID:-}"
+            echo "Using configured macOS signing/notarization secrets."
+          else
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+            unset CSC_LINK CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
+            echo "No valid MAC_CSC_LINK provided. Building unsigned mac artifacts."
+          fi
+
+          pnpm build:mac --publish always
 
   release-windows:
     needs: check-version
