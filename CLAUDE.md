@@ -13,13 +13,15 @@ NodeLink is an Electron-based SSH client (similar to Termius) built with electro
 | Dev server | `pnpm dev` |
 | Build | `pnpm build` |
 | Build (Mac) | `pnpm build:mac` |
+| Build (Win) | `pnpm build:win` |
+| E2E tests | `pnpm test:e2e` |
 | Typecheck | `pnpm typecheck` |
 | Typecheck (main only) | `pnpm typecheck:node` |
 | Typecheck (renderer only) | `pnpm typecheck:web` |
 | Lint | `pnpm lint` |
 | Format | `pnpm format` |
 
-No test runner is configured.
+E2E tests use Playwright with Electron. Test files live in `e2e/`. The `test:e2e` script builds the app first, then runs Playwright against the built output.
 
 ## Architecture
 
