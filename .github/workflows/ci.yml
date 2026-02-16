@@ -44,8 +44,11 @@ jobs:
         with:
           version: 9
 
-      - name: Install native build dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential python3 libx11-dev libxkbfile-dev
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 libx11-dev libxkbfile-dev \
+            libnss3 libatk-bridge2.0-0 libgtk-3-0 libgbm1 libasound2
 
       - name: Install dependencies
         run: pnpm install

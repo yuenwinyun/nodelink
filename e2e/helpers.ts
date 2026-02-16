@@ -6,7 +6,12 @@ let cachedUserDataDir: string | null = null
 
 export async function launchApp(): Promise<{ app: ElectronApplication; page: Page }> {
   const app = await electron.launch({
-    args: [join(__dirname, '../out/main/index.js')],
+    args: [
+      join(__dirname, '../out/main/index.js'),
+      '--no-sandbox',
+      '--disable-gpu',
+      '--disable-dev-shm-usage'
+    ],
     env: {
       ...process.env,
       NODE_ENV: 'production'
