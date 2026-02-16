@@ -120,3 +120,9 @@ export function sshDisconnectAll(): void {
     sshDisconnect(id)
   }
 }
+
+/** Expose the SSH client for a session (used by tunnel module) */
+export function getSessionClient(sessionId: string): Client | null {
+  const session = sessions.get(sessionId)
+  return session?.client ?? null
+}

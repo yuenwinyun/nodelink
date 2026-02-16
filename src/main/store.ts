@@ -2,18 +2,24 @@ import { app } from "electron";
 import { join } from "path";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { v4 as uuidv4 } from "uuid";
-import type { Host, KeychainEntry, AppData } from "../shared/types";
+import type { Host, KeychainEntry, Snippet, AppData } from "../shared/types";
 
 const dataPath = join(app.getPath("userData"), "data.json");
 
 function readData(): AppData {
   if (!existsSync(dataPath)) {
-    return { hosts: [], keychain: [] };
+    return { hosts: [], keychain: [], snippets: [] };
   }
   try {
-    return JSON.parse(readFileSync(dataPath, "utf-8"));
+    const raw = JSON.parse(readFileSync(dataPath, "utf-8"));
+    const data: AppData = { hosts: [], keychain: [], snippets: [], ...raw };
+    // Migrate: ensure every host has a tunnels array
+    data.hosts = data.hosts.map((h) =>
+      h.tunnels ? h : { ...h, tunnels: [] }
+    );
+    return data;
   } catch {
-    return { hosts: [], keychain: [] };
+    return { hosts: [], keychain: [], snippets: [] };
   }
 }
 
@@ -112,6 +118,48 @@ export function deleteKeychainEntry(id: string): boolean {
       ? { ...h, keychainId: null, updatedAt: new Date().toISOString() }
       : h,
   );
+  writeData(data);
+  return true;
+}
+
+// Snippets CRUD
+
+export function getSnippets(): Snippet[] {
+  return readData().snippets;
+}
+
+export function createSnippet(
+  input: Omit<Snippet, "id" | "createdAt" | "updatedAt">,
+): Snippet {
+  const data = readData();
+  const now = new Date().toISOString();
+  const snippet: Snippet = { ...input, id: uuidv4(), createdAt: now, updatedAt: now };
+  data.snippets.push(snippet);
+  writeData(data);
+  return snippet;
+}
+
+export function updateSnippet(
+  id: string,
+  input: Partial<Omit<Snippet, "id" | "createdAt" | "updatedAt">>,
+): Snippet | null {
+  const data = readData();
+  const index = data.snippets.findIndex((s) => s.id === id);
+  if (index === -1) return null;
+  data.snippets[index] = {
+    ...data.snippets[index],
+    ...input,
+    updatedAt: new Date().toISOString(),
+  };
+  writeData(data);
+  return data.snippets[index];
+}
+
+export function deleteSnippet(id: string): boolean {
+  const data = readData();
+  const before = data.snippets.length;
+  data.snippets = data.snippets.filter((s) => s.id !== id);
+  if (data.snippets.length === before) return false;
   writeData(data);
   return true;
 }

@@ -9,6 +9,7 @@ interface HostListProps {
   connectedHostIds: Set<string>
   onSelect: (host: Host) => void
   onConnect: (host: Host) => void
+  onResume: (hostId: string) => void
   onDelete: (id: string) => void
 }
 
@@ -18,6 +19,7 @@ export function HostList({
   connectedHostIds,
   onSelect,
   onConnect,
+  onResume,
   onDelete
 }: HostListProps): React.JSX.Element {
   const [deleteTarget, setDeleteTarget] = useState<Host | null>(null)
@@ -38,6 +40,10 @@ export function HostList({
             <ContextMenu
               items={[
                 {
+                  label: 'New Session',
+                  onClick: () => onConnect(host)
+                },
+                {
                   label: 'Delete',
                   variant: 'danger',
                   onClick: () => setDeleteTarget(host)
@@ -46,7 +52,9 @@ export function HostList({
             >
               <button
                 className={`flex items-center gap-2 w-full ${selectedId === host.id ? 'active' : ''}`}
-                onClick={() => onSelect(host)}
+                onClick={() =>
+                  connectedHostIds.has(host.id) ? onResume(host.id) : onSelect(host)
+                }
                 onDoubleClick={() => onConnect(host)}
               >
                 {connectedHostIds.has(host.id) && (

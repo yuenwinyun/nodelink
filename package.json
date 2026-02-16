@@ -14,7 +14,7 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-rebuild --only node-pty",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:win": "electron-vite build && electron-builder --win",
@@ -30,6 +30,7 @@
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
     "daisyui": "^5.5.18",
+    "node-pty": "^1.1.0",
     "ssh2": "^1.17.0",
     "tailwindcss": "^4.1.18",
     "uuid": "^13.0.0"
@@ -39,6 +40,7 @@
     "@electron-toolkit/eslint-config-ts": "^3.1.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@playwright/test": "^1.58.2",
+    "@electron/rebuild": "^4.0.3",
     "@types/node": "^22.19.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -59,6 +61,7 @@
     "onlyBuiltDependencies": [
       "electron",
       "esbuild",
+      "node-pty",
       "ssh2"
     ]
   }
