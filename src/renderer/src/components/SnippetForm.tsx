@@ -41,17 +41,25 @@ export function SnippetForm({
   }
 
   return (
-    <div className="max-w-lg mx-auto p-6">
-      <h2 className="text-xl font-bold mb-6">{snippet ? 'Edit Snippet' : 'New Snippet'}</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-md mx-auto p-6">
+      <div className="mb-6">
+        <h2 className="text-base font-semibold text-base-content">
+          {snippet ? 'Edit Snippet' : 'New Snippet'}
+        </h2>
+        <p className="text-xs text-base-content/50 mt-0.5">
+          {snippet ? 'Update snippet details' : 'Save a reusable command snippet'}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="snippet-name">
+          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="snippet-name">
             Name
           </label>
           <input
             id="snippet-name"
             type="text"
-            className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.name ? 'input-error' : ''}`}
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="List containers"
@@ -60,12 +68,12 @@ export function SnippetForm({
         </fieldset>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="snippet-command">
+          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="snippet-command">
             Command
           </label>
           <textarea
             id="snippet-command"
-            className={`textarea textarea-bordered w-full font-mono text-sm ${errors.command ? 'textarea-error' : ''}`}
+            className={`textarea textarea-bordered w-full font-mono text-sm bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.command ? 'textarea-error' : ''}`}
             value={command}
             onChange={(e) => setCommand(e.target.value)}
             placeholder="docker ps -a"
@@ -74,12 +82,12 @@ export function SnippetForm({
           {errors.command && <p className="text-error text-xs mt-1">{errors.command}</p>}
         </fieldset>
 
-        <div className="flex gap-2 pt-2">
-          <button type="submit" className="btn btn-primary">
-            {snippet ? 'Save' : 'Create'}
-          </button>
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
             Cancel
+          </button>
+          <button type="submit" className="btn btn-primary btn-sm">
+            {snippet ? 'Save' : 'Create'}
           </button>
         </div>
       </form>

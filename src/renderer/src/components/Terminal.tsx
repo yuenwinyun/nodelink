@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
+import { Code, ArrowUpDown, X } from 'lucide-react'
 import type { Host, KeychainEntry, Snippet, TunnelConfig } from '@shared/types'
 import { buildSshConfig } from '../types'
 import type { ActiveTunnel } from '../types'
@@ -85,11 +86,11 @@ export function TerminalView({
     if (!container) return
 
     const styles = getComputedStyle(document.documentElement)
-    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1d232a'
-    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#a6adbb'
-    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#a6adbb'
+    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1a1e24'
+    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#c8cdd5'
+    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#c8cdd5'
     const termSelection =
-      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(166, 173, 187, 0.2)'
+      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(200, 205, 213, 0.15)'
 
     const term = new XTerm({
       cursorBlink: true,
@@ -277,64 +278,77 @@ export function TerminalView({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="flex items-center gap-3 px-4 py-2 bg-base-200 border-b border-base-300">
-        <span className="font-medium text-sm">{host.name}</span>
-        <span className="text-xs text-base-content/50">
+      {/* Compact toolbar */}
+      <div className="flex items-center gap-1 px-2 h-8 bg-base-200/50 border-b border-base-content/5 shrink-0">
+        <span className="text-xs text-base-content/50 truncate mr-auto">
           {host.username}@{host.address}:{host.port}
         </span>
-        <div className="flex-1" />
         {status === 'connecting' && <span className="loading loading-spinner loading-xs" />}
         {status === 'connected' && (
-          <span className="badge badge-success badge-xs">Connected</span>
+          <span className="badge badge-success badge-xs badge-outline gap-1">Live</span>
         )}
         {(status === 'disconnected' || status === 'error') && (
-          <button className="btn btn-ghost btn-xs" onClick={handleReconnect}>
+          <button className="btn btn-ghost btn-xs text-xs" onClick={handleReconnect}>
             Reconnect
           </button>
         )}
         <button
-          className={`btn btn-ghost btn-xs ${tunnelPanelOpen ? 'btn-active' : ''}`}
+          className={`btn btn-ghost btn-xs btn-square ${tunnelPanelOpen ? 'btn-active' : ''}`}
           onClick={() => setTunnelPanelOpen((prev) => !prev)}
-          title="Toggle tunnels panel"
+          aria-label="Toggle tunnels panel"
+          title="Tunnels"
         >
-          Tunnels
+          <ArrowUpDown className="w-3.5 h-3.5" />
           {activeTunnels.length > 0 && (
-            <span className="badge badge-xs badge-success ml-1">{activeTunnels.length}</span>
+            <span className="badge badge-xs badge-success absolute -top-0.5 -right-0.5">{activeTunnels.length}</span>
           )}
         </button>
         <button
-          className={`btn btn-ghost btn-xs ${snippetPanelOpen ? 'btn-active' : ''}`}
+          className={`btn btn-ghost btn-xs btn-square ${snippetPanelOpen ? 'btn-active' : ''}`}
           onClick={() => setSnippetPanelOpen((prev) => !prev)}
-          title="Toggle snippets panel"
+          aria-label="Toggle snippets panel"
+          title="Snippets"
         >
-          Snippets
+          <Code className="w-3.5 h-3.5" />
         </button>
-        <button className="btn btn-ghost btn-xs text-error" onClick={handleDisconnect}>
-          Disconnect
+        <div className="w-px h-4 bg-base-content/10 mx-0.5" />
+        <button
+          className="btn btn-ghost btn-xs btn-square text-error/60 hover:text-error"
+          onClick={handleDisconnect}
+          aria-label="Disconnect"
+          title="Disconnect"
+        >
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Terminal area + snippet panel */}
+      {/* Terminal area + side panels */}
       <div className="flex-1 flex overflow-hidden relative">
         <div className="flex-1 relative">
           <div ref={termRef} className="absolute inset-0 p-1" />
 
+          {/* Accessibility: announce status changes */}
+          <div className="sr-only" aria-live="polite">
+            {status === 'connected' && `Connected to ${host.name}`}
+            {status === 'disconnected' && `Disconnected from ${host.name}`}
+          </div>
+
+          {/* Bottom-anchored status banners */}
           {status === 'connecting' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-base-300/80">
-              <div className="flex items-center gap-2">
-                <span className="loading loading-spinner loading-md" />
-                <span className="text-sm">Connecting to {host.address}...</span>
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
+              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
+                <span className="loading loading-spinner loading-sm" />
+                <span className="text-sm text-base-content/60">Connecting to {host.address}...</span>
               </div>
             </div>
           )}
 
           {status === 'error' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-base-300/80">
-              <div className="text-center">
-                <p className="text-error font-medium mb-1">Connection Failed</p>
-                <p className="text-sm text-base-content/60 mb-3">{errorMsg}</p>
-                <button className="btn btn-primary btn-sm" onClick={handleReconnect}>
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
+              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg text-center">
+                <p className="text-error font-medium text-sm mb-1">Connection Failed</p>
+                <p className="text-xs text-base-content/50 mb-3">{errorMsg}</p>
+                <button className="btn btn-primary btn-sm btn-outline" onClick={handleReconnect}>
                   Retry
                 </button>
               </div>
@@ -342,10 +356,10 @@ export function TerminalView({
           )}
 
           {status === 'disconnected' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-base-300/80">
-              <div className="text-center">
-                <p className="text-base-content/60 font-medium mb-1">Disconnected</p>
-                <button className="btn btn-primary btn-sm" onClick={handleReconnect}>
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
+              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
+                <span className="text-sm text-base-content/60">Session ended</span>
+                <button className="btn btn-primary btn-sm btn-outline" onClick={handleReconnect}>
                   Reconnect
                 </button>
               </div>
@@ -353,26 +367,24 @@ export function TerminalView({
           )}
         </div>
 
-        {tunnelPanelOpen && (
-          <TunnelPanel
-            tunnels={host.tunnels ?? []}
-            activeTunnels={activeTunnels}
-            onSaveTunnel={handleSaveTunnel}
-            onDeleteTunnel={handleDeleteTunnel}
-            onStart={handleStartTunnel}
-            onStop={handleStopTunnel}
-            onOpenBrowser={handleOpenBrowser}
-            onClose={() => setTunnelPanelOpen(false)}
-          />
-        )}
+        <TunnelPanel
+          tunnels={host.tunnels ?? []}
+          activeTunnels={activeTunnels}
+          isOpen={tunnelPanelOpen}
+          onSaveTunnel={handleSaveTunnel}
+          onDeleteTunnel={handleDeleteTunnel}
+          onStart={handleStartTunnel}
+          onStop={handleStopTunnel}
+          onOpenBrowser={handleOpenBrowser}
+          onClose={() => setTunnelPanelOpen(false)}
+        />
 
-        {snippetPanelOpen && (
-          <SnippetPanel
-            snippets={snippets}
-            onSend={handleSendSnippet}
-            onClose={() => setSnippetPanelOpen(false)}
-          />
-        )}
+        <SnippetPanel
+          snippets={snippets}
+          isOpen={snippetPanelOpen}
+          onSend={handleSendSnippet}
+          onClose={() => setSnippetPanelOpen(false)}
+        />
       </div>
 
       {/* Tunnel error toast */}

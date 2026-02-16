@@ -16,36 +16,45 @@ export function SessionTabs({
   if (sessions.length === 0) return null
 
   return (
-    <div className="flex items-center bg-base-200 border-b border-base-300 overflow-x-auto">
-      {sessions.map((session) => {
-        const isActive = session.sessionId === activeSessionId
-        const isLocal = session.type === 'local'
-        const label = isLocal ? 'Local Terminal' : session.host.name
-        return (
-          <div
-            key={session.sessionId}
-            className={`group flex items-center gap-1.5 px-3 py-1.5 text-sm cursor-pointer border-r border-base-300 shrink-0 transition-colors ${
-              isActive
-                ? 'bg-base-300 text-base-content'
-                : 'text-base-content/60 hover:bg-base-300/50 hover:text-base-content'
-            }`}
-            onClick={() => onSwitch(session.sessionId)}
-          >
-            <span className={`badge badge-xs ${isLocal ? 'badge-info' : 'badge-success'}`} />
-            <span className="truncate max-w-[120px]">{label}</span>
+    <header className="flex items-center h-10 bg-base-200/50 border-b border-base-content/5 shrink-0">
+      <div className="flex items-stretch overflow-x-auto flex-1 min-w-0 scrollbar-none">
+        {sessions.map((session) => {
+          const isActive = session.sessionId === activeSessionId
+          const isLocal = session.type === 'local'
+          const label = isLocal ? 'Local Terminal' : session.host.name
+          const statusColor = isLocal ? 'bg-info' : 'bg-success'
+          return (
             <button
-              className="btn btn-ghost btn-xs px-0.5 py-0 min-h-0 h-auto text-base-content/40 hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation()
-                onDisconnect(session.sessionId)
-              }}
-              title={isLocal ? 'Close terminal' : 'Disconnect session'}
+              key={session.sessionId}
+              role="tab"
+              aria-selected={isActive}
+              className={`group relative flex items-center gap-1.5 px-3 h-full text-xs shrink-0 transition-colors cursor-pointer ${
+                isActive
+                  ? 'text-base-content'
+                  : 'text-base-content/50 hover:text-base-content/80 hover:bg-base-300/30'
+              }`}
+              onClick={() => onSwitch(session.sessionId)}
             >
-              &times;
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
+              <span className="truncate max-w-28">{label}</span>
+              <span
+                className="ml-1 opacity-0 group-hover:opacity-100 text-base-content/40 hover:text-error transition-opacity text-sm leading-none"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDisconnect(session.sessionId)
+                }}
+                role="button"
+                aria-label={isLocal ? 'Close terminal' : 'Disconnect session'}
+              >
+                &times;
+              </span>
+              {isActive && (
+                <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-full" />
+              )}
             </button>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+    </header>
   )
 }
