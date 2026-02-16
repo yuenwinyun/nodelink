@@ -46,4 +46,4 @@ nsis:
   allowToChangeInstallationDirectory: true
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: NodeLink
-npmRebuild: true
+npmRebuild: false
