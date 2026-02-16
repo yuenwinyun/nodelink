@@ -55,19 +55,25 @@ export function HostForm({
   }
 
   return (
-    <div className="max-w-lg mx-auto p-6">
-      <h2 className="text-xl font-bold mb-6">
-        {host ? 'Edit Host' : 'New Host'}
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-md mx-auto p-6">
+      <div className="mb-6">
+        <h2 className="text-base font-semibold text-base-content">
+          {host ? 'Edit Host' : 'New Host'}
+        </h2>
+        <p className="text-xs text-base-content/50 mt-0.5">
+          {host ? 'Update connection details' : 'Configure a new SSH connection'}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-name">
+          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-name">
             Name
           </label>
           <input
             id="host-name"
             type="text"
-            className={`input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.name ? 'input-error' : ''}`}
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="My Server"
@@ -77,49 +83,59 @@ export function HostForm({
           )}
         </fieldset>
 
-        <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-address">
-            Address
-          </label>
-          <input
-            id="host-address"
-            type="text"
-            className={`input input-bordered w-full ${errors.address ? 'input-error' : ''}`}
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="192.168.1.100 or example.com"
-          />
-          {errors.address && (
-            <p className="text-error text-xs mt-1">{errors.address}</p>
-          )}
-        </fieldset>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-base-content/40">
+          Connection
+        </h3>
+
+        <div className="flex gap-3">
+          <fieldset className="fieldset flex-1">
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-address">
+              Host / IP
+            </label>
+            <input
+              id="host-address"
+              type="text"
+              className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.address ? 'input-error' : ''}`}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="192.168.1.100 or example.com"
+            />
+            {errors.address && (
+              <p className="text-error text-xs mt-1">{errors.address}</p>
+            )}
+          </fieldset>
+
+          <fieldset className="fieldset w-24">
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-port">
+              Port
+            </label>
+            <input
+              id="host-port"
+              type="number"
+              className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.port ? 'input-error' : ''}`}
+              value={port}
+              onChange={(e) => setPort(Number(e.target.value))}
+              min={1}
+              max={65535}
+            />
+            {errors.port && (
+              <p className="text-error text-xs mt-1">{errors.port}</p>
+            )}
+          </fieldset>
+        </div>
+
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-base-content/40">
+          Authentication
+        </h3>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-port">
-            Port
-          </label>
-          <input
-            id="host-port"
-            type="number"
-            className={`input input-bordered w-full ${errors.port ? 'input-error' : ''}`}
-            value={port}
-            onChange={(e) => setPort(Number(e.target.value))}
-            min={1}
-            max={65535}
-          />
-          {errors.port && (
-            <p className="text-error text-xs mt-1">{errors.port}</p>
-          )}
-        </fieldset>
-
-        <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-username">
+          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-username">
             Username
           </label>
           <input
             id="host-username"
             type="text"
-            className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.username ? 'input-error' : ''}`}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="root"
@@ -130,12 +146,12 @@ export function HostForm({
         </fieldset>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="host-keychain">
+          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-keychain">
             Keychain
           </label>
           <select
             id="host-keychain"
-            className="select select-bordered w-full"
+            className="select select-bordered select-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors"
             value={keychainId ?? ''}
             onChange={(e) => setKeychainId(e.target.value || null)}
           >
@@ -148,12 +164,12 @@ export function HostForm({
           </select>
         </fieldset>
 
-        <div className="flex gap-2 pt-2">
-          <button type="submit" className="btn btn-primary">
-            {host ? 'Save' : 'Create'}
-          </button>
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
             Cancel
+          </button>
+          <button type="submit" className="btn btn-primary btn-sm">
+            {host ? 'Save' : 'Create'}
           </button>
         </div>
       </form>

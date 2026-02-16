@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MoreHorizontal } from 'lucide-react'
 import type { KeychainEntry } from '@shared/types'
 import { ContextMenu } from './ContextMenu'
 import { ConfirmDialog } from './ConfirmDialog'
@@ -20,7 +21,7 @@ export function KeychainList({
 
   if (keychain.length === 0) {
     return (
-      <div className="text-center text-base-content/40 py-8 text-sm">
+      <div className="text-center text-base-content/40 py-8 text-xs">
         No keychain entries yet. Add one to get started.
       </div>
     )
@@ -28,10 +29,12 @@ export function KeychainList({
 
   return (
     <>
-      <ul className="menu menu-sm gap-1">
-        {keychain.map((entry) => (
-          <li key={entry.id}>
+      <div className="flex flex-col gap-0.5">
+        {keychain.map((entry) => {
+          const isSelected = selectedId === entry.id
+          return (
             <ContextMenu
+              key={entry.id}
               items={[
                 {
                   label: 'Delete',
@@ -41,21 +44,36 @@ export function KeychainList({
               ]}
             >
               <button
-                className={`flex items-center gap-2 w-full ${selectedId === entry.id ? 'active' : ''}`}
+                className={`group flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 transition-colors ${
+                  isSelected
+                    ? 'bg-primary/10 text-primary'
+                    : 'hover:bg-base-300/60 text-base-content'
+                }`}
                 onClick={() => onSelect(entry)}
               >
-                <div className="flex flex-col items-start min-w-0">
-                  <span className="font-medium truncate w-full">{entry.label}</span>
-                  <span className="text-xs text-base-content/50 truncate w-full">
+                <div className="flex flex-col items-start min-w-0 flex-1">
+                  <span className="text-sm font-medium truncate w-full leading-tight">{entry.label}</span>
+                  <span className="text-[11px] text-base-content/40 truncate w-full leading-tight">
                     {entry.username} &middot;{' '}
                     {entry.authType === 'key' ? 'SSH Key' : 'Password'}
                   </span>
                 </div>
+
+                <button
+                  className="opacity-0 group-hover:opacity-100 btn btn-ghost btn-xs btn-square transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setDeleteTarget(entry)
+                  }}
+                  aria-label={`Options for ${entry.label}`}
+                >
+                  <MoreHorizontal className="w-3.5 h-3.5" />
+                </button>
               </button>
             </ContextMenu>
-          </li>
-        ))}
-      </ul>
+          )
+        })}
+      </div>
 
       <ConfirmDialog
         open={deleteTarget !== null}

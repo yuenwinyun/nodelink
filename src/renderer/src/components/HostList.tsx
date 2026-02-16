@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MoreHorizontal } from 'lucide-react'
 import type { Host } from '@shared/types'
 import { ContextMenu } from './ContextMenu'
 import { ConfirmDialog } from './ConfirmDialog'
@@ -26,7 +27,7 @@ export function HostList({
 
   if (hosts.length === 0) {
     return (
-      <div className="text-center text-base-content/40 py-8 text-sm">
+      <div className="text-center text-base-content/40 py-8 text-xs">
         No hosts yet. Add one to get started.
       </div>
     )
@@ -34,10 +35,13 @@ export function HostList({
 
   return (
     <>
-      <ul className="menu menu-sm gap-1">
-        {hosts.map((host) => (
-          <li key={host.id}>
+      <div className="flex flex-col gap-0.5">
+        {hosts.map((host) => {
+          const isSelected = selectedId === host.id
+          const isConnected = connectedHostIds.has(host.id)
+          return (
             <ContextMenu
+              key={host.id}
               items={[
                 {
                   label: 'New Session',
@@ -51,26 +55,42 @@ export function HostList({
               ]}
             >
               <button
-                className={`flex items-center gap-2 w-full ${selectedId === host.id ? 'active' : ''}`}
+                className={`group flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 transition-colors ${
+                  isSelected
+                    ? 'bg-primary/10 text-primary'
+                    : 'hover:bg-base-300/60 text-base-content'
+                }`}
                 onClick={() =>
-                  connectedHostIds.has(host.id) ? onResume(host.id) : onSelect(host)
+                  isConnected ? onResume(host.id) : onSelect(host)
                 }
                 onDoubleClick={() => onConnect(host)}
               >
-                {connectedHostIds.has(host.id) && (
-                  <span className="badge badge-xs badge-success" />
-                )}
-                <div className="flex flex-col items-start min-w-0">
-                  <span className="font-medium truncate w-full">{host.name}</span>
-                  <span className="text-xs text-base-content/50 truncate w-full">
-                    {host.username}@{host.address}:{host.port}
+                <div className={`w-2 h-2 rounded-full shrink-0 ${
+                  isConnected ? 'bg-success shadow-[0_0_6px_theme(colors.success/40%)]' : 'bg-base-content/20'
+                }`} />
+
+                <div className="flex flex-col items-start min-w-0 flex-1">
+                  <span className="text-sm font-medium truncate w-full leading-tight">{host.name}</span>
+                  <span className="text-[11px] text-base-content/40 truncate w-full leading-tight">
+                    {host.username}@{host.address}
                   </span>
                 </div>
+
+                <button
+                  className="opacity-0 group-hover:opacity-100 btn btn-ghost btn-xs btn-square transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setDeleteTarget(host)
+                  }}
+                  aria-label={`Options for ${host.name}`}
+                >
+                  <MoreHorizontal className="w-3.5 h-3.5" />
+                </button>
               </button>
             </ContextMenu>
-          </li>
-        ))}
-      </ul>
+          )
+        })}
+      </div>
 
       <ConfirmDialog
         open={deleteTarget !== null}

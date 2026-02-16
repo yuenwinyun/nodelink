@@ -54,17 +54,27 @@ export function KeychainForm({
   }
 
   return (
-    <div className="max-w-lg mx-auto p-6">
-      <h2 className="text-xl font-bold mb-6">
-        {entry ? 'Edit Keychain Entry' : 'New Keychain Entry'}
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-md mx-auto p-6">
+      <div className="mb-6">
+        <h2 className="text-base font-semibold text-base-content">
+          {entry ? 'Edit Keychain Entry' : 'New Keychain Entry'}
+        </h2>
+        <p className="text-xs text-base-content/50 mt-0.5">
+          {entry ? 'Update credential details' : 'Store credentials for SSH connections'}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-base-content/40">
+          Identity
+        </h3>
+
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="kc-label">Label</label>
+          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="kc-label">Label</label>
           <input
             id="kc-label"
             type="text"
-            className={`input input-bordered w-full ${errors.label ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.label ? 'input-error' : ''}`}
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             placeholder="Production Server Key"
@@ -73,11 +83,11 @@ export function KeychainForm({
         </fieldset>
 
         <fieldset className="fieldset">
-          <label className="fieldset-label" htmlFor="kc-username">Username</label>
+          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="kc-username">Username</label>
           <input
             id="kc-username"
             type="text"
-            className={`input input-bordered w-full ${errors.username ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.username ? 'input-error' : ''}`}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="root"
@@ -85,8 +95,12 @@ export function KeychainForm({
           {errors.username && <p className="text-error text-xs mt-1">{errors.username}</p>}
         </fieldset>
 
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-base-content/40">
+          Credentials
+        </h3>
+
         <fieldset className="fieldset">
-          <label className="fieldset-label">Auth Type</label>
+          <label className="fieldset-label text-xs font-medium text-base-content/70">Auth Type</label>
           <div className="flex gap-4">
             <label className="label cursor-pointer gap-2">
               <input
@@ -96,7 +110,7 @@ export function KeychainForm({
                 checked={authType === 'password'}
                 onChange={() => setAuthType('password')}
               />
-              <span className="label-text">Password</span>
+              <span className="label-text text-xs">Password</span>
             </label>
             <label className="label cursor-pointer gap-2">
               <input
@@ -106,19 +120,19 @@ export function KeychainForm({
                 checked={authType === 'key'}
                 onChange={() => setAuthType('key')}
               />
-              <span className="label-text">SSH Key</span>
+              <span className="label-text text-xs">SSH Key</span>
             </label>
           </div>
         </fieldset>
 
         {authType === 'password' ? (
           <fieldset className="fieldset">
-            <label className="fieldset-label" htmlFor="kc-password">Password</label>
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="kc-password">Password</label>
             <div className="relative">
               <input
                 id="kc-password"
                 type={showPassword ? 'text' : 'password'}
-                className={`input input-bordered w-full pr-16 ${errors.password ? 'input-error' : ''}`}
+                className={`input input-bordered input-sm w-full pr-16 bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.password ? 'input-error' : ''}`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -135,10 +149,10 @@ export function KeychainForm({
           </fieldset>
         ) : (
           <fieldset className="fieldset">
-            <label className="fieldset-label" htmlFor="kc-sshkey">SSH Private Key</label>
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="kc-sshkey">SSH Private Key</label>
             <textarea
               id="kc-sshkey"
-              className={`textarea textarea-bordered w-full font-mono text-xs ${errors.sshKey ? 'textarea-error' : ''}`}
+              className={`textarea textarea-bordered w-full font-mono text-xs bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.sshKey ? 'textarea-error' : ''}`}
               rows={8}
               value={sshKey}
               onChange={(e) => setSshKey(e.target.value)}
@@ -148,12 +162,12 @@ export function KeychainForm({
           </fieldset>
         )}
 
-        <div className="flex gap-2 pt-2">
-          <button type="submit" className="btn btn-primary">
-            {entry ? 'Save' : 'Create'}
-          </button>
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
             Cancel
+          </button>
+          <button type="submit" className="btn btn-primary btn-sm">
+            {entry ? 'Save' : 'Create'}
           </button>
         </div>
       </form>

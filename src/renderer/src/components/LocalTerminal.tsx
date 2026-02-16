@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
+import { Code, X } from 'lucide-react'
 import type { Snippet } from '@shared/types'
 import { SnippetPanel } from './SnippetPanel'
 
@@ -41,11 +42,11 @@ export function LocalTerminalView({
     if (!container) return
 
     const styles = getComputedStyle(document.documentElement)
-    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1d232a'
-    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#a6adbb'
-    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#a6adbb'
+    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1a1e24'
+    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#c8cdd5'
+    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#c8cdd5'
     const termSelection =
-      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(166, 173, 187, 0.2)'
+      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(200, 205, 213, 0.15)'
 
     const term = new XTerm({
       cursorBlink: true,
@@ -171,28 +172,34 @@ export function LocalTerminalView({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="flex items-center gap-3 px-4 py-2 bg-base-200 border-b border-base-300">
-        <span className="font-medium text-sm">Local Terminal</span>
-        <div className="flex-1" />
+      {/* Compact toolbar */}
+      <div className="flex items-center gap-1 px-2 h-8 bg-base-200/50 border-b border-base-content/5 shrink-0">
+        <span className="text-xs text-base-content/50 mr-auto">Local Shell</span>
         {status === 'starting' && <span className="loading loading-spinner loading-xs" />}
         {status === 'running' && (
-          <span className="badge badge-info badge-xs">Running</span>
+          <span className="badge badge-info badge-xs badge-outline gap-1">Running</span>
         )}
         {status === 'exited' && (
-          <button className="btn btn-ghost btn-xs" onClick={handleRespawn}>
+          <button className="btn btn-ghost btn-xs text-xs" onClick={handleRespawn}>
             Restart
           </button>
         )}
         <button
-          className={`btn btn-ghost btn-xs ${snippetPanelOpen ? 'btn-active' : ''}`}
+          className={`btn btn-ghost btn-xs btn-square ${snippetPanelOpen ? 'btn-active' : ''}`}
           onClick={() => setSnippetPanelOpen((prev) => !prev)}
-          title="Toggle snippets panel"
+          aria-label="Toggle snippets panel"
+          title="Snippets"
         >
-          Snippets
+          <Code className="w-3.5 h-3.5" />
         </button>
-        <button className="btn btn-ghost btn-xs text-error" onClick={handleClose}>
-          Close
+        <div className="w-px h-4 bg-base-content/10 mx-0.5" />
+        <button
+          className="btn btn-ghost btn-xs btn-square text-error/60 hover:text-error"
+          onClick={handleClose}
+          aria-label="Close terminal"
+          title="Close"
+        >
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
 
@@ -201,22 +208,23 @@ export function LocalTerminalView({
         <div className="flex-1 relative">
           <div ref={termRef} className="absolute inset-0 p-1" />
 
+          {/* Bottom-anchored status banners */}
           {status === 'starting' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-base-300/80">
-              <div className="flex items-center gap-2">
-                <span className="loading loading-spinner loading-md" />
-                <span className="text-sm">Starting shell...</span>
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
+              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
+                <span className="loading loading-spinner loading-sm" />
+                <span className="text-sm text-base-content/60">Starting shell...</span>
               </div>
             </div>
           )}
 
           {status === 'exited' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-base-300/80">
-              <div className="text-center">
-                <p className="text-base-content/60 font-medium mb-1">
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
+              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
+                <span className="text-sm text-base-content/60">
                   Process exited{exitCode !== null ? ` (code ${exitCode})` : ''}
-                </p>
-                <button className="btn btn-primary btn-sm" onClick={handleRespawn}>
+                </span>
+                <button className="btn btn-primary btn-sm btn-outline" onClick={handleRespawn}>
                   Restart
                 </button>
               </div>
@@ -224,13 +232,12 @@ export function LocalTerminalView({
           )}
         </div>
 
-        {snippetPanelOpen && (
-          <SnippetPanel
-            snippets={snippets}
-            onSend={handleSendSnippet}
-            onClose={() => setSnippetPanelOpen(false)}
-          />
-        )}
+        <SnippetPanel
+          snippets={snippets}
+          isOpen={snippetPanelOpen}
+          onSend={handleSendSnippet}
+          onClose={() => setSnippetPanelOpen(false)}
+        />
       </div>
     </div>
   )

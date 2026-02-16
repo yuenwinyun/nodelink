@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MoreHorizontal } from 'lucide-react'
 import type { Snippet } from '@shared/types'
 import { ContextMenu } from './ContextMenu'
 import { ConfirmDialog } from './ConfirmDialog'
@@ -20,7 +21,7 @@ export function SnippetList({
 
   if (snippets.length === 0) {
     return (
-      <div className="text-center text-base-content/40 py-8 text-sm">
+      <div className="text-center text-base-content/40 py-8 text-xs">
         No snippets yet. Add one to get started.
       </div>
     )
@@ -28,10 +29,12 @@ export function SnippetList({
 
   return (
     <>
-      <ul className="menu menu-sm gap-1">
-        {snippets.map((snippet) => (
-          <li key={snippet.id}>
+      <div className="flex flex-col gap-0.5">
+        {snippets.map((snippet) => {
+          const isSelected = selectedId === snippet.id
+          return (
             <ContextMenu
+              key={snippet.id}
               items={[
                 {
                   label: 'Delete',
@@ -41,20 +44,35 @@ export function SnippetList({
               ]}
             >
               <button
-                className={`flex items-center gap-2 w-full ${selectedId === snippet.id ? 'active' : ''}`}
+                className={`group flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 transition-colors ${
+                  isSelected
+                    ? 'bg-primary/10 text-primary'
+                    : 'hover:bg-base-300/60 text-base-content'
+                }`}
                 onClick={() => onSelect(snippet)}
               >
-                <div className="flex flex-col items-start min-w-0">
-                  <span className="font-medium truncate w-full">{snippet.name}</span>
-                  <span className="text-xs text-base-content/50 truncate w-full font-mono">
+                <div className="flex flex-col items-start min-w-0 flex-1">
+                  <span className="text-sm font-medium truncate w-full leading-tight">{snippet.name}</span>
+                  <span className="text-[11px] text-base-content/40 truncate w-full font-mono leading-tight">
                     {snippet.command}
                   </span>
                 </div>
+
+                <button
+                  className="opacity-0 group-hover:opacity-100 btn btn-ghost btn-xs btn-square transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setDeleteTarget(snippet)
+                  }}
+                  aria-label={`Options for ${snippet.name}`}
+                >
+                  <MoreHorizontal className="w-3.5 h-3.5" />
+                </button>
               </button>
             </ContextMenu>
-          </li>
-        ))}
-      </ul>
+          )
+        })}
+      </div>
 
       <ConfirmDialog
         open={deleteTarget !== null}

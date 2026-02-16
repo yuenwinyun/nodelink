@@ -41,7 +41,7 @@ export function ContextMenu({ children, items }: ContextMenuProps): React.JSX.El
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="menu bg-base-200 rounded-box shadow-xl border border-base-300 p-1 min-w-[160px] z-50"
+          className="bg-base-200 rounded-lg shadow-2xl shadow-black/30 border border-base-content/5 p-1 min-w-[160px] z-50 animate-fade-in-scale"
           style={{
             position: 'fixed',
             left: position.x,
@@ -55,7 +55,7 @@ export function ContextMenu({ children, items }: ContextMenuProps): React.JSX.El
           {items.map((item) => (
             <DropdownMenu.Item
               key={item.label}
-              className={`rounded-btn px-3 py-1.5 text-sm cursor-pointer outline-none select-none transition-colors hover:bg-base-300 focus:bg-base-300 ${
+              className={`rounded-md px-3 py-1.5 text-sm cursor-pointer outline-none select-none transition-colors data-[highlighted]:bg-base-300 ${
                 item.variant === 'danger' ? 'text-error' : 'text-base-content'
               }`}
               onSelect={item.onClick}
