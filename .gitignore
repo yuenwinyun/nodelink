@@ -9,3 +9,4 @@ release
 .eslintcache
 *.log
 *.log.*
+test-results/
