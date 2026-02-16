@@ -1,4 +1,4 @@
-import { Plus, TerminalSquare } from 'lucide-react'
+import { Plus, TerminalSquare } from './icons'
 import type { Host, KeychainEntry, Snippet } from '@shared/types'
 import type { Tab } from '../types'
 import { HostList } from './HostList'

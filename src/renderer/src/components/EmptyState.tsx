@@ -1,4 +1,4 @@
-import { TerminalSquare, Plus } from 'lucide-react'
+import { TerminalSquare, Plus } from './icons'
 
 interface EmptyStateProps {
   title: string

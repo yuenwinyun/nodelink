@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
-import { Code, X } from 'lucide-react'
+import { Code, X } from './icons'
 import type { Snippet } from '@shared/types'
 import { SnippetPanel } from './SnippetPanel'
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, X } from 'lucide-react'
+import { Search, X } from './icons'
 import type { Snippet } from '@shared/types'
 
 interface SnippetPanelProps {
