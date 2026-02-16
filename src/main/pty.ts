@@ -1,8 +1,18 @@
-import * as pty from 'node-pty'
+import type * as ptyTypes from 'node-pty'
 import { BrowserWindow } from 'electron'
 import * as os from 'os'
 
-const ptys = new Map<string, pty.IPty>()
+let pty: typeof import('node-pty') | undefined
+
+function getPty(): typeof import('node-pty') {
+  if (!pty) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    pty = require('node-pty')
+  }
+  return pty!
+}
+
+const ptys = new Map<string, ptyTypes.IPty>()
 
 function getMainWindow(): BrowserWindow | null {
   const windows = BrowserWindow.getAllWindows()
@@ -20,7 +30,7 @@ export function ptySpawn(sessionId: string): void {
   const shell = getDefaultShell()
   const cwd = os.homedir()
 
-  const proc = pty.spawn(shell, [], {
+  const proc = getPty().spawn(shell, [], {
     name: 'xterm-256color',
     cols: 80,
     rows: 24,
