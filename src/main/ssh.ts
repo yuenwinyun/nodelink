@@ -1,9 +1,12 @@
 import { Client, type ClientChannel } from 'ssh2'
 import { BrowserWindow } from 'electron'
+import { fork, type ChildProcess } from 'child_process'
+import { join } from 'path'
 
 interface Session {
   client: Client
   stream: ClientChannel
+  proxy?: ChildProcess
 }
 
 const sessions = new Map<string, Session>()
@@ -13,7 +16,49 @@ function getMainWindow(): BrowserWindow | null {
   return windows[0] ?? null
 }
 
-export function sshConnect(
+/**
+ * Spawn a local TCP proxy to work around macOS blocking the Electron binary
+ * from accessing local network devices (EHOSTUNREACH). A child `node` process
+ * connects to the target and listens on localhost; Electron connects to localhost.
+ */
+function spawnTcpProxy(host: string, port: number): Promise<{ localPort: number; child: ChildProcess }> {
+  return new Promise((resolve, reject) => {
+    const scriptPath = join(__dirname, 'tcp-connect.js')
+    const child = fork(scriptPath, [JSON.stringify({ host, port })], {
+      stdio: ['ignore', 'ignore', 'ignore', 'ipc']
+    })
+
+    const timeout = setTimeout(() => {
+      child.kill()
+      reject(new Error('TCP proxy startup timed out'))
+    }, 10000)
+
+    child.on('message', (msg: { type: string; port?: number; message?: string }) => {
+      if (msg.type === 'listening' && msg.port) {
+        clearTimeout(timeout)
+        resolve({ localPort: msg.port, child })
+      } else if (msg.type === 'error') {
+        clearTimeout(timeout)
+        child.kill()
+        reject(new Error(msg.message ?? 'TCP proxy failed'))
+      }
+    })
+
+    child.on('error', (err) => {
+      clearTimeout(timeout)
+      reject(err)
+    })
+
+    child.on('exit', (code) => {
+      clearTimeout(timeout)
+      if (code !== 0 && code !== null) {
+        reject(new Error(`TCP proxy exited with code ${code}`))
+      }
+    })
+  })
+}
+
+export async function sshConnect(
   sessionId: string,
   config: {
     host: string
@@ -23,11 +68,15 @@ export function sshConnect(
     privateKey?: string
   }
 ): Promise<void> {
+  // Spawn local TCP proxy to bypass macOS network restrictions on Electron
+  const { localPort, child: proxyChild } = await spawnTcpProxy(config.host, config.port)
+
   return new Promise((resolve, reject) => {
     const client = new Client()
 
     const timeout = setTimeout(() => {
       client.end()
+      proxyChild.kill()
       reject(new Error('Connection timed out (10s)'))
     }, 10000)
 
@@ -36,11 +85,12 @@ export function sshConnect(
       client.shell({ term: 'xterm-256color' }, (err, stream) => {
         if (err) {
           client.end()
+          proxyChild.kill()
           reject(err)
           return
         }
 
-        sessions.set(sessionId, { client, stream })
+        sessions.set(sessionId, { client, stream, proxy: proxyChild })
 
         stream.on('data', (data: Buffer) => {
           const win = getMainWindow()
@@ -51,6 +101,7 @@ export function sshConnect(
 
         stream.on('close', () => {
           sessions.delete(sessionId)
+          proxyChild.kill()
           const win = getMainWindow()
           if (win && !win.isDestroyed()) {
             win.webContents.send('ssh:closed', sessionId)
@@ -65,6 +116,7 @@ export function sshConnect(
     client.on('error', (err) => {
       clearTimeout(timeout)
       sessions.delete(sessionId)
+      proxyChild.kill()
       reject(err)
     })
 
@@ -79,14 +131,16 @@ export function sshConnect(
       })
     }
 
+    // Connect to the local proxy instead of the remote host directly
     client.connect({
-      host: config.host,
-      port: config.port,
+      host: '127.0.0.1',
+      port: localPort,
       username: config.username,
       password: config.password,
       privateKey: config.privateKey,
       tryKeyboard: !!config.password,
       agent: useAgent ? process.env.SSH_AUTH_SOCK : undefined,
+      readyTimeout: 20000,
       hostVerifier: () => true // auto-accept for mock scope
     })
   })
@@ -111,6 +165,7 @@ export function sshDisconnect(sessionId: string): void {
   if (session) {
     session.stream.close()
     session.client.end()
+    session.proxy?.kill()
     sessions.delete(sessionId)
   }
 }
