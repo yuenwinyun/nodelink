@@ -3,6 +3,7 @@ import { useHosts } from './hooks/useHosts'
 import { useKeychain } from './hooks/useKeychain'
 import { useSnippets } from './hooks/useSnippets'
 import { useAppNavigation } from './hooks/useAppNavigation'
+import { useCommandPalette } from './hooks/useCommandPalette'
 import { Sidebar } from './components/Sidebar'
 import { SessionTabs } from './components/SessionTabs'
 import { HostForm } from './components/HostForm'
@@ -11,6 +12,7 @@ import { SnippetForm } from './components/SnippetForm'
 import { EmptyState } from './components/EmptyState'
 import { TerminalView } from './components/Terminal'
 import { LocalTerminalView } from './components/LocalTerminal'
+import { CommandPalette } from './components/CommandPalette'
 
 function App(): React.JSX.Element {
   const nav = useAppNavigation()
@@ -36,6 +38,7 @@ function App(): React.JSX.Element {
     update: updateSnippet,
     remove: removeSnippet
   } = useSnippets()
+  const cmdPalette = useCommandPalette()
 
   const handleSaveHost = async (
     input: Omit<Host, 'id' | 'createdAt' | 'updatedAt'>
@@ -93,7 +96,7 @@ function App(): React.JSX.Element {
       : null
 
   return (
-    <div className="flex h-screen bg-base-300 text-base-content">
+    <div data-theme="dark" className="flex h-screen bg-base-300 text-base-content">
       <Sidebar
         activeTab={nav.activeTab}
         onTabChange={nav.setActiveTab}
@@ -115,6 +118,7 @@ function App(): React.JSX.Element {
         onDeleteKeychain={handleDeleteKeychain}
         onDeleteSnippet={handleDeleteSnippet}
         onOpenLocalTerminal={nav.openLocalTerminal}
+        onOpenCommandPalette={cmdPalette.toggle}
       />
 
       <main className="flex-1 overflow-hidden flex flex-col">
@@ -210,6 +214,22 @@ function App(): React.JSX.Element {
           </div>
         ))}
       </main>
+
+      {/* Command Palette */}
+      <CommandPalette
+        open={cmdPalette.open}
+        onOpenChange={cmdPalette.setOpen}
+        hosts={hosts}
+        keychain={keychain}
+        snippets={snippets}
+        onConnectHost={nav.connectHost}
+        onSelectKeychain={nav.selectKeychain}
+        onSelectSnippet={nav.selectSnippet}
+        onAddHost={nav.addHost}
+        onAddKeychain={nav.addKeychain}
+        onAddSnippet={nav.addSnippet}
+        onOpenLocalTerminal={nav.openLocalTerminal}
+      />
     </div>
   )
 }

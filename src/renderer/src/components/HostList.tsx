@@ -55,10 +55,10 @@ export function HostList({
               ]}
             >
               <button
-                className={`group flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 transition-colors ${
+                className={`group flex items-center gap-2.5 w-full rounded-xl px-2.5 py-2 transition-colors ${
                   isSelected
-                    ? 'bg-primary/10 text-primary'
-                    : 'hover:bg-base-300/60 text-base-content'
+                    ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                    : 'hover:bg-base-content/5 text-base-content border-l-2 border-transparent'
                 }`}
                 onClick={() =>
                   isConnected ? onResume(host.id) : onSelect(host)
@@ -66,7 +66,7 @@ export function HostList({
                 onDoubleClick={() => onConnect(host)}
               >
                 <div className={`w-2 h-2 rounded-full shrink-0 ${
-                  isConnected ? 'bg-success shadow-[0_0_6px_theme(colors.success/40%)]' : 'bg-base-content/20'
+                  isConnected ? 'bg-success shadow-[0_0_8px_theme(colors.success/50%)]' : 'bg-base-content/20'
                 }`} />
 
                 <div className="flex flex-col items-start min-w-0 flex-1">

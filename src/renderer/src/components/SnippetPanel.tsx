@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Search, X } from './icons'
+import { X } from './icons'
+import { SearchInput } from './SearchInput'
 import type { Snippet } from '@shared/types'
 
 interface SnippetPanelProps {
@@ -22,7 +23,7 @@ export function SnippetPanel({ snippets, isOpen, onSend, onClose }: SnippetPanel
     <div className={`
       bg-base-200 border-l border-base-content/5 flex flex-col h-full
       transition-all duration-200 ease-out overflow-hidden
-      ${isOpen ? 'w-64 min-w-[256px] opacity-100' : 'w-0 min-w-0 opacity-0'}
+      ${isOpen ? 'w-80 min-w-[320px] opacity-100 animate-slide-in-right shadow-xl' : 'w-0 min-w-0 opacity-0'}
     `}>
       <div className="flex items-center justify-between px-3 py-2 border-b border-base-content/5">
         <div className="flex items-center gap-2">
@@ -39,16 +40,11 @@ export function SnippetPanel({ snippets, isOpen, onSend, onClose }: SnippetPanel
       </div>
 
       <div className="px-3 py-2">
-        <div className="relative">
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-base-content/40" />
-          <input
-            type="text"
-            className="input input-bordered input-sm w-full pl-8 bg-base-300/30 focus:bg-base-300/50 transition-colors"
-            placeholder="Filter snippets..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          />
-        </div>
+        <SearchInput
+          value={filter}
+          onChange={setFilter}
+          placeholder="Filter snippets..."
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin px-2 pb-2">
@@ -61,7 +57,7 @@ export function SnippetPanel({ snippets, isOpen, onSend, onClose }: SnippetPanel
             {filtered.map((snippet) => (
               <button
                 key={snippet.id}
-                className="flex flex-col items-start gap-0.5 w-full rounded-lg px-2.5 py-2 transition-colors hover:bg-base-300/60"
+                className="flex flex-col items-start gap-0.5 w-full rounded-xl px-2.5 py-2 transition-colors hover:bg-base-content/5"
                 onClick={() => onSend(snippet.command)}
                 title={`Send: ${snippet.command}`}
               >

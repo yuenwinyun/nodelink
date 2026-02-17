@@ -1,6 +1,26 @@
 @import 'tailwindcss';
 @plugin 'daisyui' {
-  themes: dark;
+  themes: dark --default;
+}
+
+@theme {
+  /* Warp-dark Catppuccin Mocha-inspired overrides */
+  --color-base-100: oklch(0.279 0.029 281.29);  /* #1e1e2e */
+  --color-base-200: oklch(0.233 0.027 281.29);  /* #181825 */
+  --color-base-300: oklch(0.188 0.025 281.29);  /* #11111b */
+  --color-base-content: oklch(0.875 0.013 281.29);  /* #cdd6f4 */
+
+  --color-primary: oklch(0.748 0.108 230.90);   /* #89b4fa - Warp blue */
+  --color-secondary: oklch(0.725 0.136 306.57);  /* #cba6f7 - Mauve */
+  --color-accent: oklch(0.842 0.100 181.79);     /* #94e2d5 - Teal */
+
+  --color-success: oklch(0.792 0.136 149.21);    /* #a6e3a1 */
+  --color-warning: oklch(0.852 0.115 85.94);     /* #f9e2af */
+  --color-error: oklch(0.700 0.148 18.72);       /* #f38ba8 */
+  --color-info: oklch(0.748 0.108 230.90);       /* #89b4fa */
+
+  --radius-btn: 0.5rem;
+  --radius-box: 0.75rem;
 }
 
 html, body, #root {
@@ -9,17 +29,18 @@ html, body, #root {
   padding: 0;
 }
 
-[data-theme='dark'] {
-  --terminal-bg: #1a1e24;
-  --terminal-fg: #c8cdd5;
-  --terminal-cursor: #c8cdd5;
-  --terminal-selection: rgba(200, 205, 213, 0.15);
+/* Terminal CSS variables - blue-tinted for warp theme */
+:root {
+  --terminal-bg: #11111b;
+  --terminal-fg: #cdd6f4;
+  --terminal-cursor: #89b4fa;
+  --terminal-selection: rgba(137, 180, 250, 0.18);
 }
 
 /* Subtle scrollbar for sidebar and panels */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: oklch(var(--bc) / 0.15) transparent;
+  scrollbar-color: oklch(0.875 0.013 281.29 / 0.12) transparent;
 }
 
 /* Hide scrollbar for session tabs */
@@ -28,6 +49,12 @@ html, body, #root {
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* Glass-morphism utility */
+.glass-surface {
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
 }
 
 /* Dialog/menu entrance animation */
@@ -43,4 +70,34 @@ html, body, #root {
 }
 .animate-fade-in-scale {
   animation: fadeInScale 150ms ease-out;
+}
+
+/* Slide-in from right (side panels) */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-slide-in-right {
+  animation: slideInFromRight 200ms ease-out;
+}
+
+/* Slide-in from bottom (status banners) */
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 200ms ease-out;
 }
