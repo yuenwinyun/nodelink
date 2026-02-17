@@ -66,109 +66,119 @@ export function HostForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <fieldset className="fieldset">
-          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-name">
-            Name
-          </label>
-          <input
-            id="host-name"
-            type="text"
-            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.name ? 'input-error' : ''}`}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="My Server"
-          />
-          {errors.name && (
-            <p className="text-error text-xs mt-1">{errors.name}</p>
-          )}
-        </fieldset>
-
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-base-content/40">
-          Connection
-        </h3>
-
-        <div className="flex gap-3">
-          <fieldset className="fieldset flex-1">
-            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-address">
-              Host / IP
+        {/* General section */}
+        <div className="bg-base-200/50 rounded-xl border border-base-content/5 p-4 space-y-4">
+          <h3 className="text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
+            General
+          </h3>
+          <fieldset className="fieldset">
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-name">
+              Name
             </label>
             <input
-              id="host-address"
+              id="host-name"
               type="text"
-              className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.address ? 'input-error' : ''}`}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="192.168.1.100 or example.com"
+              className={`input input-bordered input-sm w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors placeholder:text-base-content/30 ${errors.name ? 'input-error' : ''}`}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="My Server"
             />
-            {errors.address && (
-              <p className="text-error text-xs mt-1">{errors.address}</p>
-            )}
-          </fieldset>
-
-          <fieldset className="fieldset w-24">
-            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-port">
-              Port
-            </label>
-            <input
-              id="host-port"
-              type="number"
-              className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.port ? 'input-error' : ''}`}
-              value={port}
-              onChange={(e) => setPort(Number(e.target.value))}
-              min={1}
-              max={65535}
-            />
-            {errors.port && (
-              <p className="text-error text-xs mt-1">{errors.port}</p>
+            {errors.name && (
+              <p className="text-error text-xs mt-1">{errors.name}</p>
             )}
           </fieldset>
         </div>
 
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-base-content/40">
-          Authentication
-        </h3>
+        {/* Connection section */}
+        <div className="bg-base-200/50 rounded-xl border border-base-content/5 p-4 space-y-4">
+          <h3 className="text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
+            Connection
+          </h3>
+          <div className="flex gap-3">
+            <fieldset className="fieldset flex-1">
+              <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-address">
+                Host / IP
+              </label>
+              <input
+                id="host-address"
+                type="text"
+                className={`input input-bordered input-sm w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors placeholder:text-base-content/30 ${errors.address ? 'input-error' : ''}`}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="192.168.1.100 or example.com"
+              />
+              {errors.address && (
+                <p className="text-error text-xs mt-1">{errors.address}</p>
+              )}
+            </fieldset>
 
-        <fieldset className="fieldset">
-          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-username">
-            Username
-          </label>
-          <input
-            id="host-username"
-            type="text"
-            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.username ? 'input-error' : ''}`}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="root"
-          />
-          {errors.username && (
-            <p className="text-error text-xs mt-1">{errors.username}</p>
-          )}
-        </fieldset>
+            <fieldset className="fieldset w-24">
+              <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-port">
+                Port
+              </label>
+              <input
+                id="host-port"
+                type="number"
+                className={`input input-bordered input-sm w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors ${errors.port ? 'input-error' : ''}`}
+                value={port}
+                onChange={(e) => setPort(Number(e.target.value))}
+                min={1}
+                max={65535}
+              />
+              {errors.port && (
+                <p className="text-error text-xs mt-1">{errors.port}</p>
+              )}
+            </fieldset>
+          </div>
+        </div>
 
-        <fieldset className="fieldset">
-          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-keychain">
-            Keychain
-          </label>
-          <select
-            id="host-keychain"
-            className="select select-bordered select-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors"
-            value={keychainId ?? ''}
-            onChange={(e) => setKeychainId(e.target.value || null)}
-          >
-            <option value="">None</option>
-            {keychain.map((entry) => (
-              <option key={entry.id} value={entry.id}>
-                {entry.label} ({entry.username})
-              </option>
-            ))}
-          </select>
-        </fieldset>
+        {/* Authentication section */}
+        <div className="bg-base-200/50 rounded-xl border border-base-content/5 p-4 space-y-4">
+          <h3 className="text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
+            Authentication
+          </h3>
+          <fieldset className="fieldset">
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-username">
+              Username
+            </label>
+            <input
+              id="host-username"
+              type="text"
+              className={`input input-bordered input-sm w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors placeholder:text-base-content/30 ${errors.username ? 'input-error' : ''}`}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="root"
+            />
+            {errors.username && (
+              <p className="text-error text-xs mt-1">{errors.username}</p>
+            )}
+          </fieldset>
+
+          <fieldset className="fieldset">
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="host-keychain">
+              Keychain
+            </label>
+            <select
+              id="host-keychain"
+              className="select select-bordered select-sm w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors"
+              value={keychainId ?? ''}
+              onChange={(e) => setKeychainId(e.target.value || null)}
+            >
+              <option value="">None</option>
+              {keychain.map((entry) => (
+                <option key={entry.id} value={entry.id}>
+                  {entry.label} ({entry.username})
+                </option>
+              ))}
+            </select>
+          </fieldset>
+        </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
+          <button type="button" className="btn btn-ghost btn-sm rounded-lg" onClick={onCancel}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-primary btn-sm">
+          <button type="submit" className="btn btn-primary btn-sm rounded-lg">
             {host ? 'Save' : 'Create'}
           </button>
         </div>

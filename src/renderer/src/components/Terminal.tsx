@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
-import { Code, ArrowUpDown, X } from './icons'
+import { Code, ArrowUpDown, X, RefreshCw } from './icons'
+import { StatusPill } from './StatusPill'
 import type { Host, KeychainEntry, Snippet, TunnelConfig } from '@shared/types'
 import { buildSshConfig } from '../types'
 import type { ActiveTunnel } from '../types'
@@ -86,11 +87,11 @@ export function TerminalView({
     if (!container) return
 
     const styles = getComputedStyle(document.documentElement)
-    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1a1e24'
-    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#c8cdd5'
-    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#c8cdd5'
+    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#11111b'
+    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#cdd6f4'
+    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#89b4fa'
     const termSelection =
-      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(200, 205, 213, 0.15)'
+      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(137, 180, 250, 0.18)'
 
     const term = new XTerm({
       cursorBlink: true,
@@ -278,20 +279,19 @@ export function TerminalView({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Compact toolbar */}
-      <div className="flex items-center gap-1 px-2 h-8 bg-base-200/50 border-b border-base-content/5 shrink-0">
+      {/* Toolbar */}
+      <div className="flex items-center gap-1.5 px-3 h-10 bg-base-200/50 border-b border-base-content/5 shrink-0">
         <span className="text-xs text-base-content/50 truncate mr-auto">
           {host.username}@{host.address}:{host.port}
         </span>
-        {status === 'connecting' && <span className="loading loading-spinner loading-xs" />}
-        {status === 'connected' && (
-          <span className="badge badge-success badge-xs badge-outline gap-1">Live</span>
-        )}
+        <StatusPill status={status} />
         {(status === 'disconnected' || status === 'error') && (
-          <button className="btn btn-ghost btn-xs text-xs" onClick={handleReconnect}>
+          <button className="btn btn-ghost btn-xs gap-1 text-xs" onClick={handleReconnect}>
+            <RefreshCw className="w-3 h-3" />
             Reconnect
           </button>
         )}
+        <div className="w-px h-4 bg-base-content/10 mx-0.5" />
         <button
           className={`btn btn-ghost btn-xs btn-square ${tunnelPanelOpen ? 'btn-active' : ''}`}
           onClick={() => setTunnelPanelOpen((prev) => !prev)}
@@ -313,7 +313,7 @@ export function TerminalView({
         </button>
         <div className="w-px h-4 bg-base-content/10 mx-0.5" />
         <button
-          className="btn btn-ghost btn-xs btn-square text-error/60 hover:text-error"
+          className="btn btn-ghost btn-xs btn-square text-base-content/40 hover:text-error hover:bg-error/10 transition-colors"
           onClick={handleDisconnect}
           aria-label="Disconnect"
           title="Disconnect"
@@ -325,7 +325,7 @@ export function TerminalView({
       {/* Terminal area + side panels */}
       <div className="flex-1 flex overflow-hidden relative">
         <div className="flex-1 relative">
-          <div ref={termRef} className="absolute inset-0 p-1" />
+          <div ref={termRef} className="absolute inset-0 p-2" />
 
           {/* Accessibility: announce status changes */}
           <div className="sr-only" aria-live="polite">
@@ -335,20 +335,20 @@ export function TerminalView({
 
           {/* Bottom-anchored status banners */}
           {status === 'connecting' && (
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
-              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
-                <span className="loading loading-spinner loading-sm" />
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 animate-slide-in-bottom">
+              <div className="glass-surface bg-base-200/80 rounded-xl px-5 py-3 shadow-xl border border-base-content/5 flex items-center gap-3">
+                <span className="loading loading-spinner loading-sm text-primary" />
                 <span className="text-sm text-base-content/60">Connecting to {host.address}...</span>
               </div>
             </div>
           )}
 
           {status === 'error' && (
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
-              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg text-center">
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 animate-slide-in-bottom">
+              <div className="glass-surface bg-base-200/80 rounded-xl px-5 py-3 shadow-xl border border-base-content/5 text-center">
                 <p className="text-error font-medium text-sm mb-1">Connection Failed</p>
                 <p className="text-xs text-base-content/50 mb-3">{errorMsg}</p>
-                <button className="btn btn-primary btn-sm btn-outline" onClick={handleReconnect}>
+                <button className="btn btn-primary btn-sm btn-outline rounded-lg" onClick={handleReconnect}>
                   Retry
                 </button>
               </div>
@@ -356,10 +356,10 @@ export function TerminalView({
           )}
 
           {status === 'disconnected' && (
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
-              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 animate-slide-in-bottom">
+              <div className="glass-surface bg-base-200/80 rounded-xl px-5 py-3 shadow-xl border border-base-content/5 flex items-center gap-3">
                 <span className="text-sm text-base-content/60">Session ended</span>
-                <button className="btn btn-primary btn-sm btn-outline" onClick={handleReconnect}>
+                <button className="btn btn-primary btn-sm btn-outline rounded-lg" onClick={handleReconnect}>
                   Reconnect
                 </button>
               </div>
@@ -390,7 +390,7 @@ export function TerminalView({
       {/* Tunnel error toast */}
       {tunnelError && (
         <div className="absolute bottom-4 right-4 z-50">
-          <div className="alert alert-error alert-sm shadow-lg">
+          <div className="alert alert-error alert-sm shadow-lg rounded-xl">
             <span className="text-xs">{tunnelError}</span>
           </div>
         </div>

@@ -44,10 +44,10 @@ export function SnippetList({
               ]}
             >
               <button
-                className={`group flex items-center gap-2.5 w-full rounded-lg px-2.5 py-2 transition-colors ${
+                className={`group flex items-center gap-2.5 w-full rounded-xl px-2.5 py-2 transition-colors ${
                   isSelected
-                    ? 'bg-primary/10 text-primary'
-                    : 'hover:bg-base-300/60 text-base-content'
+                    ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                    : 'hover:bg-base-content/5 text-base-content border-l-2 border-transparent'
                 }`}
                 onClick={() => onSelect(snippet)}
               >

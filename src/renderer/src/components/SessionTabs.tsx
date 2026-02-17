@@ -17,7 +17,7 @@ export function SessionTabs({
 
   return (
     <header className="flex items-center h-10 bg-base-200/50 border-b border-base-content/5 shrink-0">
-      <div className="flex items-stretch overflow-x-auto flex-1 min-w-0 scrollbar-none">
+      <div className="flex items-stretch gap-1 overflow-x-auto flex-1 min-w-0 scrollbar-none px-2">
         {sessions.map((session) => {
           const isActive = session.sessionId === activeSessionId
           const isLocal = session.type === 'local'
@@ -28,10 +28,10 @@ export function SessionTabs({
               key={session.sessionId}
               role="tab"
               aria-selected={isActive}
-              className={`group relative flex items-center gap-1.5 px-3 h-full text-xs shrink-0 transition-colors cursor-pointer ${
+              className={`group relative flex items-center gap-1.5 px-3 h-9 text-xs shrink-0 rounded-lg transition-all cursor-pointer ${
                 isActive
-                  ? 'text-base-content'
-                  : 'text-base-content/50 hover:text-base-content/80 hover:bg-base-300/30'
+                  ? 'bg-base-100 text-base-content shadow-sm'
+                  : 'text-base-content/50 hover:text-base-content/80 hover:bg-base-content/5'
               }`}
               onClick={() => onSwitch(session.sessionId)}
             >
@@ -48,9 +48,6 @@ export function SessionTabs({
               >
                 &times;
               </span>
-              {isActive && (
-                <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-full" />
-              )}
             </button>
           )
         })}

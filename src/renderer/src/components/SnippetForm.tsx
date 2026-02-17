@@ -52,41 +52,46 @@ export function SnippetForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <fieldset className="fieldset">
-          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="snippet-name">
-            Name
-          </label>
-          <input
-            id="snippet-name"
-            type="text"
-            className={`input input-bordered input-sm w-full bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.name ? 'input-error' : ''}`}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="List containers"
-          />
-          {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
-        </fieldset>
+        <div className="bg-base-200/50 rounded-xl border border-base-content/5 p-4 space-y-4">
+          <h3 className="text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
+            Details
+          </h3>
+          <fieldset className="fieldset">
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="snippet-name">
+              Name
+            </label>
+            <input
+              id="snippet-name"
+              type="text"
+              className={`input input-bordered input-sm w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors placeholder:text-base-content/30 ${errors.name ? 'input-error' : ''}`}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="List containers"
+            />
+            {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
+          </fieldset>
 
-        <fieldset className="fieldset">
-          <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="snippet-command">
-            Command
-          </label>
-          <textarea
-            id="snippet-command"
-            className={`textarea textarea-bordered w-full font-mono text-sm bg-base-300/30 focus:bg-base-300/50 transition-colors ${errors.command ? 'textarea-error' : ''}`}
-            value={command}
-            onChange={(e) => setCommand(e.target.value)}
-            placeholder="docker ps -a"
-            rows={4}
-          />
-          {errors.command && <p className="text-error text-xs mt-1">{errors.command}</p>}
-        </fieldset>
+          <fieldset className="fieldset">
+            <label className="fieldset-label text-xs font-medium text-base-content/70" htmlFor="snippet-command">
+              Command
+            </label>
+            <textarea
+              id="snippet-command"
+              className={`textarea textarea-bordered w-full font-mono text-sm bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors ${errors.command ? 'textarea-error' : ''}`}
+              value={command}
+              onChange={(e) => setCommand(e.target.value)}
+              placeholder="docker ps -a"
+              rows={4}
+            />
+            {errors.command && <p className="text-error text-xs mt-1">{errors.command}</p>}
+          </fieldset>
+        </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
+          <button type="button" className="btn btn-ghost btn-sm rounded-lg" onClick={onCancel}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-primary btn-sm">
+          <button type="submit" className="btn btn-primary btn-sm rounded-lg">
             {snippet ? 'Save' : 'Create'}
           </button>
         </div>

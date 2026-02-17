@@ -80,7 +80,7 @@ export function TunnelPanel({
     <div className={`
       bg-base-200 border-l border-base-content/5 flex flex-col h-full
       transition-all duration-200 ease-out overflow-hidden
-      ${isOpen ? 'w-72 min-w-[288px] opacity-100' : 'w-0 min-w-0 opacity-0'}
+      ${isOpen ? 'w-80 min-w-[320px] opacity-100 animate-slide-in-right shadow-xl' : 'w-0 min-w-0 opacity-0'}
     `}>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-base-content/5">
@@ -112,11 +112,11 @@ export function TunnelPanel({
           return (
             <div
               key={tunnel.id}
-              className="rounded-lg bg-base-300/40 p-2.5 mb-2"
+              className="rounded-xl bg-base-300/40 border border-base-content/5 p-2.5 mb-2"
             >
               <div className="flex items-center gap-2 mb-1">
                 {isActive ? (
-                  <span className="w-2 h-2 rounded-full bg-success shadow-[0_0_6px_theme(colors.success/40%)]" />
+                  <span className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_theme(colors.success/50%)]" />
                 ) : (
                   <span className="w-2 h-2 rounded-full bg-base-content/20" />
                 )}
@@ -141,13 +141,13 @@ export function TunnelPanel({
                 {isActive ? (
                   <>
                     <button
-                      className="btn btn-ghost btn-xs"
+                      className="btn btn-ghost btn-xs rounded-lg"
                       onClick={() => onStop(tunnel.id)}
                     >
                       Stop
                     </button>
                     <button
-                      className="btn btn-primary btn-xs btn-outline flex-1"
+                      className="btn btn-primary btn-xs btn-outline flex-1 rounded-lg"
                       onClick={() => onOpenBrowser(tunnel.localPort)}
                     >
                       Open in Browser
@@ -155,7 +155,7 @@ export function TunnelPanel({
                   </>
                 ) : (
                   <button
-                    className="btn btn-success btn-xs btn-outline flex-1"
+                    className="btn btn-success btn-xs btn-outline flex-1 rounded-lg"
                     onClick={() => onStart(tunnel)}
                   >
                     Start
@@ -168,13 +168,13 @@ export function TunnelPanel({
 
         {/* Add form */}
         {showForm && (
-          <div className="rounded-lg bg-base-300/40 p-2.5 mb-2">
+          <div className="rounded-xl bg-base-300/40 border border-base-content/5 p-2.5 mb-2">
             <div className="flex flex-col gap-2">
               <fieldset className="fieldset">
                 <label className="fieldset-label text-xs font-medium text-base-content/70">Name</label>
                 <input
                   type="text"
-                  className="input input-bordered input-xs w-full bg-base-300/30 focus:bg-base-300/50 transition-colors"
+                  className="input input-bordered input-xs w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors"
                   placeholder="e.g. Dev Server"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -185,7 +185,7 @@ export function TunnelPanel({
                 <label className="fieldset-label text-xs font-medium text-base-content/70">Local Port</label>
                 <input
                   type="number"
-                  className="input input-bordered input-xs w-full bg-base-300/30 focus:bg-base-300/50 transition-colors"
+                  className="input input-bordered input-xs w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors"
                   placeholder="e.g. 8080"
                   value={localPort}
                   onChange={(e) => setLocalPort(e.target.value)}
@@ -196,7 +196,7 @@ export function TunnelPanel({
                 <label className="fieldset-label text-xs font-medium text-base-content/70">Remote Host</label>
                 <input
                   type="text"
-                  className="input input-bordered input-xs w-full bg-base-300/30 focus:bg-base-300/50 transition-colors"
+                  className="input input-bordered input-xs w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors"
                   placeholder="localhost"
                   value={remoteHost}
                   onChange={(e) => setRemoteHost(e.target.value)}
@@ -207,7 +207,7 @@ export function TunnelPanel({
                 <label className="fieldset-label text-xs font-medium text-base-content/70">Remote Port</label>
                 <input
                   type="number"
-                  className="input input-bordered input-xs w-full bg-base-300/30 focus:bg-base-300/50 transition-colors"
+                  className="input input-bordered input-xs w-full bg-base-300/20 focus:border-primary/30 rounded-lg transition-colors"
                   placeholder="e.g. 3000"
                   value={remotePort}
                   onChange={(e) => setRemotePort(e.target.value)}
@@ -217,10 +217,10 @@ export function TunnelPanel({
               {error && <p className="text-error text-xs">{error}</p>}
 
               <div className="flex gap-1.5 mt-1">
-                <button className="btn btn-ghost btn-xs flex-1" onClick={resetForm}>
+                <button className="btn btn-ghost btn-xs flex-1 rounded-lg" onClick={resetForm}>
                   Cancel
                 </button>
-                <button className="btn btn-primary btn-xs flex-1" onClick={handleAdd}>
+                <button className="btn btn-primary btn-xs flex-1 rounded-lg" onClick={handleAdd}>
                   Save
                 </button>
               </div>
@@ -233,7 +233,7 @@ export function TunnelPanel({
       {!showForm && (
         <div className="p-2 border-t border-base-content/5">
           <button
-            className="btn btn-ghost btn-xs btn-block bg-base-300/40 hover:bg-base-300 gap-1.5 justify-start font-normal"
+            className="btn btn-ghost btn-xs btn-block bg-base-300/40 hover:bg-base-300 gap-1.5 justify-start font-normal rounded-lg"
             onClick={() => setShowForm(true)}
           >
             <Plus className="w-3.5 h-3.5 text-base-content/50" />

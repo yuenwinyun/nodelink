@@ -31,8 +31,8 @@ export function ConfirmDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-sm rounded-xl bg-base-200 p-6 shadow-2xl shadow-black/30 focus:outline-none animate-fade-in-scale">
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 glass-surface z-50" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-sm rounded-xl bg-base-200/95 glass-surface p-6 shadow-2xl shadow-black/40 border border-base-content/5 focus:outline-none animate-fade-in-scale">
           <Dialog.Title className="text-base font-semibold text-base-content">
             {title}
           </Dialog.Title>
@@ -41,13 +41,13 @@ export function ConfirmDialog({
           </Dialog.Description>
           <div className="mt-6 flex justify-end gap-2">
             <Dialog.Close asChild>
-              <button type="button" className="btn btn-ghost btn-sm">
+              <button type="button" className="btn btn-ghost btn-sm rounded-lg">
                 {cancelLabel}
               </button>
             </Dialog.Close>
             <button
               type="button"
-              className={`${btnClass} btn-sm`}
+              className={`${btnClass} btn-sm rounded-lg`}
               onClick={() => {
                 onConfirm()
                 onOpenChange(false)

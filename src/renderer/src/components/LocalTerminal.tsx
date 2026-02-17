@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
-import { Code, X } from './icons'
+import { Code, X, RefreshCw } from './icons'
+import { StatusPill } from './StatusPill'
 import type { Snippet } from '@shared/types'
 import { SnippetPanel } from './SnippetPanel'
 
@@ -42,11 +43,11 @@ export function LocalTerminalView({
     if (!container) return
 
     const styles = getComputedStyle(document.documentElement)
-    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#1a1e24'
-    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#c8cdd5'
-    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#c8cdd5'
+    const termBg = styles.getPropertyValue('--terminal-bg').trim() || '#11111b'
+    const termFg = styles.getPropertyValue('--terminal-fg').trim() || '#cdd6f4'
+    const termCursor = styles.getPropertyValue('--terminal-cursor').trim() || '#89b4fa'
     const termSelection =
-      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(200, 205, 213, 0.15)'
+      styles.getPropertyValue('--terminal-selection').trim() || 'rgba(137, 180, 250, 0.18)'
 
     const term = new XTerm({
       cursorBlink: true,
@@ -172,18 +173,17 @@ export function LocalTerminalView({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Compact toolbar */}
-      <div className="flex items-center gap-1 px-2 h-8 bg-base-200/50 border-b border-base-content/5 shrink-0">
+      {/* Toolbar */}
+      <div className="flex items-center gap-1.5 px-3 h-10 bg-base-200/50 border-b border-base-content/5 shrink-0">
         <span className="text-xs text-base-content/50 mr-auto">Local Shell</span>
-        {status === 'starting' && <span className="loading loading-spinner loading-xs" />}
-        {status === 'running' && (
-          <span className="badge badge-info badge-xs badge-outline gap-1">Running</span>
-        )}
+        <StatusPill status={status} />
         {status === 'exited' && (
-          <button className="btn btn-ghost btn-xs text-xs" onClick={handleRespawn}>
+          <button className="btn btn-ghost btn-xs gap-1 text-xs" onClick={handleRespawn}>
+            <RefreshCw className="w-3 h-3" />
             Restart
           </button>
         )}
+        <div className="w-px h-4 bg-base-content/10 mx-0.5" />
         <button
           className={`btn btn-ghost btn-xs btn-square ${snippetPanelOpen ? 'btn-active' : ''}`}
           onClick={() => setSnippetPanelOpen((prev) => !prev)}
@@ -194,7 +194,7 @@ export function LocalTerminalView({
         </button>
         <div className="w-px h-4 bg-base-content/10 mx-0.5" />
         <button
-          className="btn btn-ghost btn-xs btn-square text-error/60 hover:text-error"
+          className="btn btn-ghost btn-xs btn-square text-base-content/40 hover:text-error hover:bg-error/10 transition-colors"
           onClick={handleClose}
           aria-label="Close terminal"
           title="Close"
@@ -206,25 +206,25 @@ export function LocalTerminalView({
       {/* Terminal area + snippet panel */}
       <div className="flex-1 flex overflow-hidden relative">
         <div className="flex-1 relative">
-          <div ref={termRef} className="absolute inset-0 p-1" />
+          <div ref={termRef} className="absolute inset-0 p-2" />
 
           {/* Bottom-anchored status banners */}
           {status === 'starting' && (
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
-              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
-                <span className="loading loading-spinner loading-sm" />
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 animate-slide-in-bottom">
+              <div className="glass-surface bg-base-200/80 rounded-xl px-5 py-3 shadow-xl border border-base-content/5 flex items-center gap-3">
+                <span className="loading loading-spinner loading-sm text-primary" />
                 <span className="text-sm text-base-content/60">Starting shell...</span>
               </div>
             </div>
           )}
 
           {status === 'exited' && (
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 bg-gradient-to-t from-base-300/95 to-base-300/0">
-              <div className="bg-base-200 rounded-lg px-5 py-3 shadow-lg flex items-center gap-3">
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center p-4 animate-slide-in-bottom">
+              <div className="glass-surface bg-base-200/80 rounded-xl px-5 py-3 shadow-xl border border-base-content/5 flex items-center gap-3">
                 <span className="text-sm text-base-content/60">
                   Process exited{exitCode !== null ? ` (code ${exitCode})` : ''}
                 </span>
-                <button className="btn btn-primary btn-sm btn-outline" onClick={handleRespawn}>
+                <button className="btn btn-primary btn-sm btn-outline rounded-lg" onClick={handleRespawn}>
                   Restart
                 </button>
               </div>
